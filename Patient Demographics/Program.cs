@@ -4,6 +4,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Patient_Demographics
 {
@@ -28,7 +29,6 @@ namespace Patient_Demographics
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Host terminated unexpectedly.");
-                Log.Fatal(ex.Message, "Message : ");
                 return 1;
             }
             finally

@@ -5,13 +5,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Patient_Demographics.Infrastructure.Repositories;
+using Patient_Demographics.Infrastructure.Services;
 using Serilog;
 using System;
 using System.IO;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Patient_Demographics.Infrastructure.Repositories;
-using Patient_Demographics.Infrastructure.Services;
 
 namespace Patient_Demographics
 {
@@ -31,13 +30,12 @@ namespace Patient_Demographics
 
             services.AddControllers();
 
+            services.AddDbContext<PatientContext>(options => 
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("PatientDB")));
+
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
-
-            services.AddDbContext<PatientContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
 
             services.AddSwaggerGen(swaggerGenOptions =>
             {

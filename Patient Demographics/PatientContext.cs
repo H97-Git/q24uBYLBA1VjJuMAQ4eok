@@ -5,7 +5,7 @@ namespace Patient_Demographics
 {
     public class PatientContext:DbContext
     {
-        public PatientContext(DbContextOptions options):base(options)
+        public PatientContext(DbContextOptions<PatientContext> options):base(options)
         {
         }
         public DbSet<Patient> Patients { get; set; }
