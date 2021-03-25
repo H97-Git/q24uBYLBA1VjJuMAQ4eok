@@ -41,11 +41,5 @@ namespace Patient_Demographics.Infrastructure.Repositories
             await _patientContext.SaveChangesAsync();
         }
 
-        //public async Task DeletePatient(int id)
-        //{
-        //    var patient = await _patientContext.Patients.FindAsync(id);
-        //    _patientContext.Patients.Remove(patient);
-        //    await _patientContext.SaveChangesAsync();
-        //}
     }
 }

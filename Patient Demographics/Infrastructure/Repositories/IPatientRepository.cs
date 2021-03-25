@@ -11,6 +11,5 @@ namespace Patient_Demographics.Infrastructure.Repositories
         Task<Patient> GetPatient(int id);
         Task UpdatePatient([Required] Patient patient);
         Task SavePatient([Required] Patient patient);
-        //Task DeletePatient(int id);
     }
 }

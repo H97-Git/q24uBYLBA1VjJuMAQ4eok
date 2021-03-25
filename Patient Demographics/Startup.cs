@@ -11,6 +11,10 @@ using Serilog;
 using System;
 using System.IO;
 using System.Reflection;
+using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace Patient_Demographics
 {
@@ -23,27 +27,26 @@ namespace Patient_Demographics
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Information("ConfigureServices()");
+            Log.Information("Startup : ConfigureServices()");
 
             services.AddControllers();
 
-            services.AddDbContext<PatientContext>(options => 
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("PatientDB")));
-
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
+
+            services.AddDbContext<PatientContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("PatientDB")));
 
             services.AddSwaggerGen(swaggerGenOptions =>
             {
                 swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Patient Demographics",
+                    Title = "PatientValidator Demographics",
                     Version = "v1",
-                    Description = "Patient Demographics API for OpenClassrooms",
+                    Description = "PatientValidator Demographics API for OpenClassrooms",
                     Contact = new OpenApiContact
                     {
                         Name = "Arno",
@@ -80,27 +83,52 @@ namespace Patient_Demographics
                 //    }
                 //});
             });
-
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Information("Configure()");
+            Log.Information("Startup : Configure()");
             app.UseSerilogRequestLogging();
+
+            app.UseExceptionHandler(builder =>
+            {
+                builder.Run(async context =>
+                {
+                    var ex = context.Features.Get<IExceptionHandlerPathFeature>().Error;
+                    string exType = ex.GetType().Name;
+                    switch (exType)
+                    {
+                        case "KeyNotFoundException":
+                            await context.Response
+                                .WriteAsJsonAsync(new { Error = "Patient not found.", PatientId = ex.Message });
+                            Log.Error(ex, "Patient not found.");
+                            break;
+                        case "ValidationException":
+                            var validationException = (ValidationException)ex;
+                            Log.Error(ex.Message);
+                            await context.Response
+                                .WriteAsJsonAsync(new { validationException.Errors });
+                            break;
+                        default:
+                            await context.Response
+                                .WriteAsJsonAsync(new { Error = "An unknown error has occurred." });
+                            return;
+                    }
+                });
+            });
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patient_Demographics v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patient Demographics v1"));
             }
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }

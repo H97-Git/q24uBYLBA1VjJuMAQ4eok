@@ -10,6 +10,5 @@ namespace Patient_Demographics.Infrastructure.Services
         Task<PatientDto> GetPatient(int id);
         Task UpdatePatient(PatientDto patientDto);
         Task SavePatient(PatientDto patientDto);
-        //Task DeletePatient(int id);
     }
 }

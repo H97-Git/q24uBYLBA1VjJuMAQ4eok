@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Patient_Demographics.DTO;
 using Patient_Demographics.Infrastructure.Services;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Patient_Demographics.Controllers
 {
@@ -20,41 +17,66 @@ namespace Patient_Demographics.Controllers
         {
             _patientService = patientService;
         }
-        // GET: api/<PatientController>
+
+        /// <summary>
+        /// Gets all the patients.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="List{PatientDto}"/>A list of patient.
+        /// </returns>
         [HttpGet]
-        public async Task<List<PatientDto>> Get()
+        [ProducesResponseType(typeof(List<PatientDto>), StatusCodes.Status200OK)]
+        public async Task<List<PatientDto>> GetAsync()
         {
             return await _patientService.GetPatient();
         }
 
-        // GET api/<PatientController>/5
+        /// <summary>
+        /// Gets the patient by id.
+        /// </summary>
+        /// <param name="id">The id of a patient.</param>
+        /// <returns>
+        /// The <see cref="PatientDto"/>A patient information.
+        /// </returns>
         [HttpGet("{id}")]
-        public async Task<PatientDto> Get(int id)
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
+        public async Task<PatientDto> GetByIdAsync(int id)
         {
             var patient = await _patientService.GetPatient(id);
             return patient;
         }
 
-        // POST api/<PatientController>
+        /// <summary>
+        /// Save a patient.
+        /// </summary>
+        /// <param name="patientDto">The patient dto.</param>
+        /// <returns>
+        /// The <see cref="ActionResult{PatientDto}"/>The patient created.
+        /// </returns>
         [HttpPost]
-        public ActionResult<PatientDto> Post([FromBody] PatientDto patientDto)
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PatientDto>> PostAsync([FromBody] PatientDto patientDto)
         {
-            _patientService.SavePatient(patientDto);
-            return CreatedAtAction("Get", new {id = patientDto.Id}, patientDto);
+            await _patientService.SavePatient(patientDto);
+            return CreatedAtAction("Get", new { id = patientDto.Id }, patientDto);
         }
 
-        // PUT api/<PatientController>/5
+        /// <summary>
+        /// Update a patient by id.
+        /// </summary>
+        /// <param name="id">The id of a patient.</param>
+        /// <param name="patientDto">The patient dto to update.</param>
+        /// <returns>
+        /// The <see cref="ActionResult{PatientDto}"/>The patient updated.
+        /// </returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] PatientDto patientDto)
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PatientDto>> PutAsync(int id, [FromBody] PatientDto patientDto)
         {
             await _patientService.UpdatePatient(patientDto);
             return Ok(_patientService.GetPatient(id));
         }
-
-        //// DELETE api/<PatientController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }
