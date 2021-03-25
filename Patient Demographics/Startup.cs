@@ -44,9 +44,9 @@ namespace Patient_Demographics
             {
                 swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "PatientValidator Demographics",
+                    Title = "Patient Demographics",
                     Version = "v1",
-                    Description = "PatientValidator Demographics API for OpenClassrooms",
+                    Description = "Patient Demographics API for OpenClassrooms",
                     Contact = new OpenApiContact
                     {
                         Name = "Arno",
