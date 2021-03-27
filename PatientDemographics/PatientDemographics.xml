@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PatientDemographics</name>
+    </assembly>
+    <members>
+        <member name="M:PatientDemographics.Controllers.PatientController.GetAllPatientAsync">
+            <summary>
+            Gets all the patients.
+            </summary>
+            <returns>
+            The <see cref="T:System.Collections.Generic.List`1"/>A list of patient.
+            </returns>
+        </member>
+        <member name="M:PatientDemographics.Controllers.PatientController.GetByIdAsync(System.Int32)">
+            <summary>
+            Gets the patient by id.
+            </summary>
+            <param name="id">The id of a patient.</param>
+            <returns>
+            The <see cref="T:PatientDemographics.DTO.PatientDto"/>A patient information.
+            </returns>
+        </member>
+        <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(System.String,System.String,System.DateTime,System.String,System.String,System.String)">
+            <summary>
+            Save a patient.
+            </summary>
+            <param name="family">Patient family name</param>
+            <param name="given">Patient given name</param>
+            <param name="dob">Patient date of birth</param>
+            <param name="gender">Patient gender</param>
+            <param name="address">Patient home address</param>
+            <param name="phone">Patient phone number</param>
+            <returns>
+            The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/>The patient created.
+            </returns>
+        </member>
+        <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(PatientDemographics.DTO.PatientDto)">
+            <summary>
+            Save a patient.
+            </summary>
+            <param name="patientDto">the patient information from the body</param>
+            <returns>
+            The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/>The patient created.
+            </returns>
+        </member>
+        <member name="M:PatientDemographics.Controllers.PatientController.PutAsync(System.Int32,PatientDemographics.DTO.PatientDto)">
+            <summary>
+            Update a patient by id.
+            </summary>
+            <param name="id">The id of a patient.</param>
+            <param name="patientDto">The patient dto to update.</param>
+            <returns>
+            The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/>The patient updated.
+            </returns>
+        </member>
+    </members>
+</doc>

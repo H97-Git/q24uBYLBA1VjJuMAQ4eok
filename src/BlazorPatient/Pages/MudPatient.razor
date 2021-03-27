@@ -1,0 +1,123 @@
+﻿@page "/Patient"
+@using BlazorPatient.DTO
+@inject Infrastructure.Services.IPatientService PatientService
+@inject ISnackbar SnackBar
+
+@if (_patients == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Elevation="25" Items="_patients" Filter="new Func<PatientDto, bool>(Search)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Patient</MudText>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0">
+                Placeholder="Search for Patient..."
+            </MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Given Name</MudTh>
+            <MudTh>Family Name</MudTh>
+            <MudTh>Date Of Birth</MudTh>
+            <MudTh>Gender</MudTh>
+            <MudTh>Home Address</MudTh>
+            <MudTh>Phone Number</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="GivenName">@context.GivenName</MudTd>
+            <MudTd DataLabel="FamilyName">@context.FamilyName</MudTd>
+            <MudTd DataLabel="DateOfBirth">@context.DateOfBirth</MudTd>
+            <MudTd DataLabel="Gender">@context.Gender</MudTd>
+            <MudTd DataLabel="HomeAddress">@context.HomeAddress</MudTd>
+            <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="">
+                <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    <br />
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Add / Edit Patient</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="_patient.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true"></MudTextField>
+            <MudTextField @bind-Value="_patient.GivenName" Label="Given Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="_patient.FamilyName" Label="Family Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <MudDatePicker @bind-Date="_patient.DateOfBirth"
+                           Color="Color.Warning"
+                           HelperText="Helper Text Example"
+                           Label="Date Of Birth"
+                           MinDate="DateTime.Now.Subtract(new TimeSpan(876600,0,0))"
+                           PickerVariant="PickerVariant.Dialog"
+                           TitleDateFormat="dd MMM" />
+            <MudSelect @bind-Value="_patient.Gender" Label="Gender" Variant="Variant.Text" Margin="Margin.Normal">
+                @foreach (Gender item in Enum.GetValues(typeof(Gender)))
+                    {
+                    <MudSelectItem T="Gender?" Value="@item">@item</MudSelectItem>
+                    }
+            </MudSelect>
+            <MudTextField @bind-Value="_patient.HomeAddress" Label="Home Address" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="_patient.PhoneNumber" Label="Phone Number" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <br />
+            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save Patient</MudButton>
+        </MudCardContent>
+    </MudCard>
+}
+
+@code{
+    private string searchString = "";
+    private PatientDto _patient = new();
+    private List<PatientDto> _patients = new();
+    protected override async Task OnInitializedAsync()
+    {
+        _patients = await PatientService.Get();
+    }
+
+    private bool Search(PatientDto patientParam)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        return patientParam.GivenName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+               || patientParam.FamilyName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+               || patientParam.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task GetPatientDto()
+    {
+        _patients = await PatientService.Get();
+    }
+
+    private async Task Save()
+    {
+        int result = await PatientService.Save(_patient);
+        _patient = new PatientDto();
+        switch (result)
+        {
+            case 0:
+                SnackBar.Add("Something went wrong.", Severity.Error);
+                break;
+            case 1:
+                SnackBar.Add("Patient Saved.", Severity.Success);
+                break;
+            case 2:
+                SnackBar.Add("Patient Updated.", Severity.Success);
+                break;
+        }
+        await GetPatientDto();
+    }
+
+    private void Edit(int id)
+    {
+        _patient = _patients.FirstOrDefault(p => p.Id == id);
+    }
+}
