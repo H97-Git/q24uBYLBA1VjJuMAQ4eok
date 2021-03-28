@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using PatientDemographics.DTO;
 using System;
+using PatientDemographics.Data.DTO;
 
 namespace PatientDemographics.Internal
 {

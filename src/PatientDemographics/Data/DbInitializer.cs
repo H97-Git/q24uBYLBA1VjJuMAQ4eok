@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using PatientDemographics.Models;
 using Serilog;
 using System.Linq;
 

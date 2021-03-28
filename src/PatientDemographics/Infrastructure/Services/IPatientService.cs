@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using PatientDemographics.DTO;
+using PatientDemographics.Data.DTO;
 
 namespace PatientDemographics.Infrastructure.Services
 {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PatientDemographics.Models;
 
 namespace PatientDemographics.Data
 {

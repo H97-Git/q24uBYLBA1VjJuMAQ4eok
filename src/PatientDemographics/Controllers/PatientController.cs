@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PatientDemographics.Commands;
-using PatientDemographics.DTO;
-using PatientDemographics.Queries;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PatientDemographics.Data.DTO;
+using PatientDemographics.Features.Commands;
+using PatientDemographics.Features.Queries;
 
 namespace PatientDemographics.Controllers
 {
@@ -31,9 +31,9 @@ namespace PatientDemographics.Controllers
         [ProducesResponseType(typeof(List<PatientDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<PatientDto>>> GetAllPatientAsync()
         {
-            var query = new GetAllPatientQuery();
+            var query = new GetAllPatient.Query();
             var result = await _mediator.Send(query);
-            return Ok(result);
+            return Ok(result.PatientsDto);
         }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace PatientDemographics.Controllers
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PatientDto>> GetByIdAsync(int id)
         {
-            var query = new GetPatientByIdQuery(id);
-            var result = await _mediator.Send(query);
-            return Ok(result);
+            var query = new GetPatientById.Query(id);
+            var response = await _mediator.Send(query);
+            return Ok(response.PatientDto);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace PatientDemographics.Controllers
             [FromQuery] string address,
             [FromQuery] string phone)
         {
-            var command = new PostPatientParamsCommand(family, given, dob, gender, address, phone);
+            var command = new PostPatientParams.Command(family, given, dob, gender, address, phone);
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
         }
@@ -91,7 +91,7 @@ namespace PatientDemographics.Controllers
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
         public async Task<ActionResult<PatientDto>> PostAsync([FromBody] PatientDto patientDto)
         {
-            var command = new PostPatientBodyCommand(patientDto);
+            var command = new PostPatientBody.Command(patientDto);
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
         }
@@ -109,7 +109,7 @@ namespace PatientDemographics.Controllers
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PatientDto>> PutAsync(int id, [FromBody] PatientDto patientDto)
         {
-            var command = new PutPatientCommand(id, patientDto);
+            var command = new PutPatient.Command(id, patientDto);
             var result = await _mediator.Send(command);
             return Ok(result);
         }

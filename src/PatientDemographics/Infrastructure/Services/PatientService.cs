@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Mapster;
-using PatientDemographics.DTO;
 using PatientDemographics.Infrastructure.Repositories;
 using PatientDemographics.Internal;
-using PatientDemographics.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PatientDemographics.Data;
+using PatientDemographics.Data.DTO;
 
 namespace PatientDemographics.Infrastructure.Services
 {

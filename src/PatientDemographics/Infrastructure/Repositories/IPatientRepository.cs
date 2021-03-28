@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using PatientDemographics.Models;
+using PatientDemographics.Data;
 
 namespace PatientDemographics.Infrastructure.Repositories
 {

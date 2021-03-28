@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PatientDemographics.Models
+namespace PatientDemographics.Data
 {
     public class Patient
     {

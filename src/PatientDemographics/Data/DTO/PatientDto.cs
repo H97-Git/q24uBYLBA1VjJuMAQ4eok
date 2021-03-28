@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PatientDemographics.DTO
+namespace PatientDemographics.Data.DTO
 {
     public class PatientDto
     {

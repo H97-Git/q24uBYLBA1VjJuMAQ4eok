@@ -18,7 +18,7 @@
             </summary>
             <param name="id">The id of a patient.</param>
             <returns>
-            The <see cref="T:PatientDemographics.DTO.PatientDto"/>A patient information.
+            The <see cref="T:PatientDemographics.Data.DTO.PatientDto"/>A patient information.
             </returns>
         </member>
         <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(System.String,System.String,System.DateTime,System.String,System.String,System.String)">
@@ -35,7 +35,7 @@
             The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/>The patient created.
             </returns>
         </member>
-        <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(PatientDemographics.DTO.PatientDto)">
+        <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(PatientDemographics.Data.DTO.PatientDto)">
             <summary>
             Save a patient.
             </summary>
@@ -44,7 +44,7 @@
             The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/>The patient created.
             </returns>
         </member>
-        <member name="M:PatientDemographics.Controllers.PatientController.PutAsync(System.Int32,PatientDemographics.DTO.PatientDto)">
+        <member name="M:PatientDemographics.Controllers.PatientController.PutAsync(System.Int32,PatientDemographics.Data.DTO.PatientDto)">
             <summary>
             Update a patient by id.
             </summary>

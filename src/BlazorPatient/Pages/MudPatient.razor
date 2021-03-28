@@ -3,7 +3,7 @@
 @inject Infrastructure.Services.IPatientService PatientService
 @inject ISnackbar SnackBar
 
-@if (_patients == null)
+@if (_patients is null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
