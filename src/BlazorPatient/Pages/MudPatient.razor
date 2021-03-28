@@ -100,11 +100,13 @@ else
     private async Task Save()
     {
         int result = await PatientService.Save(_patient);
+        var cachePatient = _patient;
         _patient = new PatientDto();
         switch (result)
         {
             case 0:
                 SnackBar.Add("Something went wrong.", Severity.Error);
+                _patient = cachePatient;
                 break;
             case 1:
                 SnackBar.Add("Patient Saved.", Severity.Success);

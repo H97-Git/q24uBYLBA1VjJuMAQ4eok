@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -13,6 +12,8 @@ namespace BlazorPatient.Infrastructure.Services
     public class PatientService : IPatientService
     {
         private readonly HttpClient _client;
+
+        private record Command(PatientDto PatientDto);
 
         public PatientService(IHttpClientFactory httpClientFactory)
         {
@@ -32,13 +33,13 @@ namespace BlazorPatient.Infrastructure.Services
             return patients;
         }
 
-        public async Task<int> Save([Required] PatientDto patientDto)
+        public async Task<int> Save(PatientDto patientDto)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(patientDto), Encoding.UTF8);
+            var content = new StringContent(JsonConvert.SerializeObject(new Command(patientDto)), Encoding.UTF8);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var apiResponse = patientDto.Id == 0
-                 ? await _client.PostAsync("/Patient/add", content)
+                 ? await _client.PostAsync("/Patient/addBody", content)
                  : await _client.PutAsync("/Patient/edit/" + patientDto.Id, content);
 
             return apiResponse.IsSuccessStatusCode ? patientDto.Id == 0 ? 1 : 2 : 0;

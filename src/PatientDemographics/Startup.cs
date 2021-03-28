@@ -43,6 +43,8 @@ namespace PatientDemographics
 
             services.AddSwaggerGen(swaggerGenOptions =>
             {
+                swaggerGenOptions.CustomSchemaIds(type => type.ToString());
+
                 swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Patient Demographics",

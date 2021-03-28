@@ -83,15 +83,14 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Save a patient.
         /// </summary>
-        /// <param name="patientDto">the patient information from the body</param>
+        /// <param name="command">The command with the patient information from the body</param>
         /// <returns>
-        /// The <see cref="ActionResult{PatientDto}"/>The patient created.
+        /// The <see cref="PatientDto"/>The patient created.
         /// </returns>
         [HttpPost("addBody")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PatientDto>> PostAsync([FromBody] PatientDto patientDto)
+        public async Task<ActionResult<PatientDto>> PostAsync([FromBody] PostPatientBody.Command command)
         {
-            var command = new PostPatientBody.Command(patientDto);
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
         }
@@ -99,17 +98,15 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Update a patient by id.
         /// </summary>
-        /// <param name="id">The id of a patient.</param>
-        /// <param name="patientDto">The patient dto to update.</param>
+        /// <param name="command">The command with the id and data of a patient.</param>
         /// <returns>
         /// The <see cref="ActionResult{PatientDto}"/>The patient updated.
         /// </returns>
         [HttpPut("edit/{id}")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PatientDto>> PutAsync(int id, [FromBody] PatientDto patientDto)
+        public async Task<ActionResult<PatientDto>> PutAsync([FromBody] PutPatient.Command command)
         {
-            var command = new PutPatient.Command(id, patientDto);
             var result = await _mediator.Send(command);
             return Ok(result);
         }
