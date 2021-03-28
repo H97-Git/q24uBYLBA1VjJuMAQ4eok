@@ -38,12 +38,17 @@ namespace PatientDemographics.Infrastructure.Services
         public async Task UpdatePatient(PatientDto patientDto)
         {
             var validationResult = await _patientValidator.ValidateAsync(patientDto);
-
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.ToString(), validationResult.Errors);
             }
+
             var patient = await _patientRepository.GetPatient(patientDto.Id);
+            if (patient is null)
+            {
+                throw new KeyNotFoundException($"{patientDto.Id}");
+            }
+
             patientDto.Adapt(patient);
             await _patientRepository.UpdatePatient(patient);
         }

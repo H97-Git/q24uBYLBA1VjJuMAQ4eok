@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
+using PatientDemographics.Data;
 using PatientDemographics.Infrastructure.Repositories;
 using System.Threading.Tasks;
-using PatientDemographics.Models;
 using Xunit;
 
 namespace PatientDemographics.Tests.Infrastructure.Repositories
@@ -10,6 +10,7 @@ namespace PatientDemographics.Tests.Infrastructure.Repositories
     public class PatientRepositoryTests
     {
         private readonly DatabaseFixture _fixture;
+        private const string FamilyName = "Blazor";
         public PatientRepositoryTests(DatabaseFixture fixture)
         {
             _fixture = fixture;
@@ -43,7 +44,7 @@ namespace PatientDemographics.Tests.Infrastructure.Repositories
         [Theory]
         [InlineData(0)]
         [InlineData(999)]
-        public async Task GetBid_ShouldReturnNull_WhenDoesNotExist(int id)
+        public async Task GetPatient_ShouldReturnNull_WhenDoesNotExist(int id)
         {
             // Arrange
             var sut = new PatientRepository(_fixture.PatientContext);
@@ -56,34 +57,35 @@ namespace PatientDemographics.Tests.Infrastructure.Repositories
         }
 
         [Fact]
-        public async Task CreateBid_ShouldAddEntity()
+        public async Task CreatePatient_ShouldAddEntity()
         {
             //Arrange
             var sut = new PatientRepository(_fixture.InMemoryContext);
 
             //Act
-            await sut.SavePatient(new Patient { FamilyName = "Unit Test"});
+            await sut.SavePatient(new Patient { FamilyName = FamilyName });
             var patient = await sut.GetPatient(6);
 
             //Assert
             patient.Should().NotBeNull();
-            patient.FamilyName.Should().Be("Unit Test");
+            patient.FamilyName.Should().Be(FamilyName);
         }
 
         [Fact]
-        public async Task UpdateBid_ShouldChangeEntity()
+        public async Task UpdatePatient_ShouldChangeEntity()
         {
             //Arrange
             var sut = new PatientRepository(_fixture.InMemoryContext);
             var patient = await sut.GetPatient(1);
-            patient.FamilyName = "Unit Test";
+            patient.FamilyName = FamilyName;
 
             //Act
             await sut.UpdatePatient(patient);
             patient = await sut.GetPatient(1);
+
             //Assert
             patient.Should().NotBeNull();
-            patient.FamilyName.Should().Be("Unit Test");
+            patient.FamilyName.Should().Be(FamilyName);
         }
     }
 }

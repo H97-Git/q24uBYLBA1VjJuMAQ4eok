@@ -22,14 +22,14 @@ namespace PatientDemographics.Controllers
         }
 
         /// <summary>
-        /// Gets all the patients.
+        /// Gets all patients.
         /// </summary>
         /// <returns>
-        /// The <see cref="List{PatientDto}"/>A list of patient.
+        /// The <see cref="List{PatientDto}"/> A list of patient.
         /// </returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<PatientDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<PatientDto>>> GetAllPatientAsync()
+        public async Task<ActionResult<List<PatientDto>>> GetAllAsync()
         {
             var query = new GetAllPatient.Query();
             var result = await _mediator.Send(query);
@@ -37,11 +37,11 @@ namespace PatientDemographics.Controllers
         }
 
         /// <summary>
-        /// Gets the patient by id.
+        /// Gets a patient by id.
         /// </summary>
         /// <param name="id">The id of a patient.</param>
         /// <returns>
-        /// The <see cref="PatientDto"/>A patient information.
+        /// The <see cref="PatientDto"/> A patient information.
         /// </returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
@@ -56,14 +56,14 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Save a patient.
         /// </summary>
-        /// <param name="family">Patient family name</param>
-        /// <param name="given">Patient given name</param>
-        /// <param name="dob">Patient date of birth</param>
-        /// <param name="gender">Patient gender</param>
-        /// <param name="address">Patient home address</param>
-        /// <param name="phone">Patient phone number</param>
+        /// <param name="family"> Patient family name</param>
+        /// <param name="given"> Patient given name</param>
+        /// <param name="dob"> Patient date of birth</param>
+        /// <param name="gender"> Patient gender</param>
+        /// <param name="address"> Patient home address</param>
+        /// <param name="phone"> Patient phone number</param>
         /// <returns>
-        /// The <see cref="ActionResult{PatientDto}"/>The patient created.
+        /// The <see cref="ActionResult{PatientDto}"/> The patient created.
         /// </returns>
         [HttpPost("add")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
@@ -83,13 +83,13 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Save a patient.
         /// </summary>
-        /// <param name="command">The command with the patient information from the body</param>
+        /// <param name="command"> The command with the patient information from the body</param>
         /// <returns>
-        /// The <see cref="PatientDto"/>The patient created.
+        /// The <see cref="PatientDto"/> The patient created.
         /// </returns>
         [HttpPost("addBody")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PatientDto>> PostAsync([FromBody] PostPatientBody.Command command)
+        public async Task<ActionResult<PatientDto>> PostBodyAsync([FromBody] PostPatientBody.Command command)
         {
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
@@ -98,9 +98,9 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Update a patient by id.
         /// </summary>
-        /// <param name="command">The command with the id and data of a patient.</param>
+        /// <param name="command"> The command with the id and data of a patient.</param>
         /// <returns>
-        /// The <see cref="ActionResult{PatientDto}"/>The patient updated.
+        /// The <see cref="ActionResult{PatientDto}"/> The patient updated.
         /// </returns>
         [HttpPut("edit/{id}")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]

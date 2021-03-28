@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using PatientDemographics.Data;
-using PatientDemographics.Models;
 using PatientDemographics.Tests.Properties;
 using System;
 using Xunit;
