@@ -21,21 +21,16 @@
             The <see cref="T:PatientDemographics.Data.DTO.PatientDto"/> A patient information.
             </returns>
         </member>
-        <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(System.String,System.String,System.DateTime,System.String,System.String,System.String)">
+        <member name="M:PatientDemographics.Controllers.PatientController.PostAsync(PatientDemographics.Features.Commands.PostPatient.Command)">
             <summary>
             Save a patient.
             </summary>
-            <param name="family"> Patient family name</param>
-            <param name="given"> Patient given name</param>
-            <param name="dob"> Patient date of birth</param>
-            <param name="gender"> Patient gender</param>
-            <param name="address"> Patient home address</param>
-            <param name="phone"> Patient phone number</param>
+            <param name="command"> The command with the patient information from the query</param>
             <returns>
             The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/> The patient created.
             </returns>
         </member>
-        <member name="M:PatientDemographics.Controllers.PatientController.PostBodyAsync(PatientDemographics.Features.Commands.PostPatientBody.Command)">
+        <member name="M:PatientDemographics.Controllers.PatientController.PostBodyAsync(PatientDemographics.Features.Commands.PostPatient.Command)">
             <summary>
             Save a patient.
             </summary>
@@ -46,7 +41,7 @@
         </member>
         <member name="M:PatientDemographics.Controllers.PatientController.PutAsync(PatientDemographics.Features.Commands.PutPatient.Command)">
             <summary>
-            Update a patient by id.
+            Update a patient.
             </summary>
             <param name="command"> The command with the id and data of a patient.</param>
             <returns>

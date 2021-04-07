@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PatientHistory</name>
+    </assembly>
+    <members>
+        <member name="M:PatientHistory.Controllers.NoteController.GetAllAsync">
+            <summary>
+            Gets all notes.
+            </summary>
+            <returns>
+            The <see cref="T:System.Collections.Generic.List`1"/> A list of note.
+            </returns>
+        </member>
+        <member name="M:PatientHistory.Controllers.NoteController.GetByIdAsync(System.String)">
+            <summary>
+            Get a note by id.
+            </summary>
+            <param name="id">The id of a note</param>
+            <returns>
+            The <see cref="T:PatientHistory.Data.DTO.NoteDto"/> A note.
+            </returns>
+        </member>
+        <member name="M:PatientHistory.Controllers.NoteController.GetByPatientIdAsync(System.Int32)">
+            <summary>
+            Get all notes for a patient.
+            </summary>
+            <param name="patientId">The id of the patient</param>
+            <returns>
+            The <see cref="T:System.Collections.Generic.List`1"/> A list of note for one patient.
+            </returns>
+        </member>
+        <member name="M:PatientHistory.Controllers.NoteController.PostAsync(PatientHistory.Data.DTO.NoteDto)">
+            <summary>
+            Save a note for a patient.
+            </summary>
+            <param name="noteDto">The dto with the note information</param>
+            <returns>
+            The <see cref="T:PatientHistory.Data.DTO.NoteDto"/> The note created.
+            </returns>
+        </member>
+        <member name="M:PatientHistory.Controllers.NoteController.PutAsync(System.String,PatientHistory.Data.DTO.NoteDto)">
+            <summary>
+            Update a note for a patient.
+            </summary>
+            <param name="id">The id for a note </param>
+            <param name="noteDto">The dto with the note information</param>
+            <returns>
+            The <see cref="T:PatientHistory.Data.DTO.NoteDto"/> The note created.
+            </returns>
+        </member>
+    </members>
+</doc>

@@ -39,8 +39,8 @@ namespace BlazorPatient.Infrastructure.Services
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var apiResponse = patientDto.Id == 0
-                 ? await _client.PostAsync("/Patient/addBody", content)
-                 : await _client.PutAsync("/Patient/edit/" + patientDto.Id, content);
+                ? await _client.PostAsync("/Patient/addBody", content)
+                : await _client.PutAsync("/Patient/edit/" + patientDto.Id, content);
 
             return apiResponse.IsSuccessStatusCode ? patientDto.Id == 0 ? 1 : 2 : 0;
             //IsSuccesStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2

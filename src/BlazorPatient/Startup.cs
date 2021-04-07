@@ -27,6 +27,7 @@ namespace BlazorPatient
             services.AddMudServices();
             services.AddHttpClient();
             services.AddScoped<IPatientService,PatientService>();
+            services.AddScoped<INoteService,NoteService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

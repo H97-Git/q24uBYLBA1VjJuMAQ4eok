@@ -26,14 +26,7 @@ namespace PatientDemographics.Data
                     o.PhoneNumber = f.Person.Phone;
                 });
 
-            var patients = new Patient[]
-            {
-                faker.Generate(),
-                faker.Generate(),
-                faker.Generate(),
-                faker.Generate(),
-                faker.Generate()
-            };
+            var patients = faker.Generate(5).ToArray();
 
             Log.Information("DbInitializer : Seeding Db ...");
             foreach (var p in patients)

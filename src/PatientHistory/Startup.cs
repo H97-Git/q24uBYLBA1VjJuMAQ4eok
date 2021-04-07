@@ -1,23 +1,23 @@
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using PatientDemographics.Data;
-using PatientDemographics.Infrastructure.Repositories;
-using PatientDemographics.Infrastructure.Services;
+using PatientHistory.Data;
+using PatientHistory.Infrastructure.Repositories;
+using PatientHistory.Infrastructure.Services;
 using Serilog;
 using System;
 using System.IO;
 using System.Reflection;
-using MediatR;
 
-namespace PatientDemographics
+namespace PatientHistory
 {
     public class Startup
     {
@@ -31,16 +31,17 @@ namespace PatientDemographics
         public void ConfigureServices(IServiceCollection services)
         {
             Log.Information("Startup : ConfigureServices()");
-
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
 
-            services.AddTransient<IPatientRepository, PatientRepository>();
-            services.AddTransient<IPatientService, PatientService>();
+            services.Configure<NoteDbSettings>(Configuration.GetSection(nameof(NoteDbSettings)));
+            services.AddSingleton<INoteDbSettings>(sp =>
+                sp.GetRequiredService<IOptions<NoteDbSettings>>().Value);
 
-            services.AddDbContext<PatientContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("PatientDB")));
+            services.AddHttpClient();
+            services.AddSingleton<INoteRepository, NoteRepository>();
+            services.AddSingleton<INoteService, NoteService>();
+            services.AddSingleton<IPatientService, PatientService>();
 
             services.AddSwaggerGen(swaggerGenOptions =>
             {
@@ -48,9 +49,9 @@ namespace PatientDemographics
 
                 swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Patient Demographics",
+                    Title = "Patient History",
                     Version = "v1",
-                    Description = "Patient Demographics API for OpenClassrooms",
+                    Description = "Patient History API for OpenClassrooms",
                     Contact = new OpenApiContact
                     {
                         Name = "Arno",
@@ -58,34 +59,10 @@ namespace PatientDemographics
                         Url = new Uri("https://github.com/H97-Git/"),
                     },
                 });
-                //swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-                //{
-                //    Name = "Authorization",
-                //    Type = SecuritySchemeType.ApiKey,
-                //    Scheme = "Bearer",
-                //    BearerFormat = "JWT",
-                //    In = ParameterLocation.Header,
-                //    Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX....\"",
-                //});
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 swaggerGenOptions.IncludeXmlComments(xmlPath);
-
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                //{
-                //    {
-                //        new OpenApiSecurityScheme
-                //        {
-                //            Reference = new OpenApiReference
-                //            {
-                //                Type = ReferenceType.SecurityScheme,
-                //                Id = "Bearer"
-                //            }
-                //        },
-                //        Array.Empty<string>()
-                //    }
-                //});
             });
 
             services.AddMediatR(typeof(Startup).Assembly);
@@ -109,11 +86,11 @@ namespace PatientDemographics
                         case "KeyNotFoundException":
                             await context.Response
                                 .WriteAsJsonAsync(new { Error = "Resources not found in the system.", Id = ex.Message });
-                            Log.Error(ex, "Resources not found.");
+                            Log.Error(ex, "Resources not found in the system.");
                             return;
                         case "ValidationException":
                             var validationException = (ValidationException)ex;
-                            Log.Error(ex.Message,"Validation Exception");
+                            Log.Error(ex.Message, "Validation Exception");
                             await context.Response
                                 .WriteAsJsonAsync(new { validationException.Errors });
                             return;
@@ -130,11 +107,15 @@ namespace PatientDemographics
             {
                 //app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patient Demographics v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PatientHistory v1"));
             }
+
             app.UseHttpsRedirection();
+
             app.UseRouting();
+
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();

@@ -6,7 +6,7 @@ using PatientDemographics.Infrastructure.Services;
 
 namespace PatientDemographics.Features.Commands
 {
-    public static class PostPatientBody
+    public static class PostPatient
     {
         public record Command(PatientDto PatientDto) : IRequest<PatientDto>;
 

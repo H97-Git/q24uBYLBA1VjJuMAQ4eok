@@ -1,12 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using PatientDemographics.Data.DTO;
 using PatientDemographics.Features.Commands;
 using PatientDemographics.Features.Queries;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PatientDemographics.Controllers
 {
@@ -56,28 +55,16 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Save a patient.
         /// </summary>
-        /// <param name="family"> Patient family name</param>
-        /// <param name="given"> Patient given name</param>
-        /// <param name="dob"> Patient date of birth</param>
-        /// <param name="gender"> Patient gender</param>
-        /// <param name="address"> Patient home address</param>
-        /// <param name="phone"> Patient phone number</param>
+        /// <param name="command"> The command with the patient information from the query</param>
         /// <returns>
         /// The <see cref="ActionResult{PatientDto}"/> The patient created.
         /// </returns>
         [HttpPost("add")]
-        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PatientDto>> PostAsync(
-            [FromQuery] string family,
-            [FromQuery] string given,
-            [FromQuery] DateTime dob,
-            [FromQuery] string gender,
-            [FromQuery] string address,
-            [FromQuery] string phone)
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status201Created)]
+        public async Task<ActionResult<PatientDto>> PostAsync([FromQuery] PostPatient.Command command)
         {
-            var command = new PostPatientParams.Command(family, given, dob, gender, address, phone);
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetByIdAsync), new { result.Id }, result);
         }
 
         /// <summary>
@@ -88,21 +75,21 @@ namespace PatientDemographics.Controllers
         /// The <see cref="PatientDto"/> The patient created.
         /// </returns>
         [HttpPost("addBody")]
-        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PatientDto>> PostBodyAsync([FromBody] PostPatientBody.Command command)
+        [ProducesResponseType(typeof(PatientDto), StatusCodes.Status201Created)]
+        public async Task<ActionResult<PatientDto>> PostBodyAsync([FromBody] PostPatient.Command command)
         {
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetByIdAsync), new { result.Id }, result);
         }
 
         /// <summary>
-        /// Update a patient by id.
+        /// Update a patient.
         /// </summary>
         /// <param name="command"> The command with the id and data of a patient.</param>
         /// <returns>
         /// The <see cref="ActionResult{PatientDto}"/> The patient updated.
         /// </returns>
-        [HttpPut("edit/{id}")]
+        [HttpPut("edit")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PatientDto>> PutAsync([FromBody] PutPatient.Command command)
