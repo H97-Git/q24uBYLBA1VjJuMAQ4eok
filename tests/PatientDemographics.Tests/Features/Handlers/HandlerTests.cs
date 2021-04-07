@@ -21,10 +21,8 @@ namespace PatientDemographics.Tests.Features.Handlers
             var list = new List<PatientDto> { _patient };
 
             _patientService = Substitute.For<IPatientService>();
-            //var mediator = Substitute.For<IMediator>();
             _patientService.GetPatient().Returns(list);
             _patientService.GetPatient(Arg.Any<int>()).Returns(_patient);
-            //mediator.Send(Arg.Any<GetAllPatient.Query>()).Returns(new GetAllPatient.Response(list));
         }
 
         [Fact]
@@ -59,22 +57,8 @@ namespace PatientDemographics.Tests.Features.Handlers
         public async Task PostPatient()
         {
             // Arrange
-            var command = new PostPatientParams.Command(_patient.FamilyName,_patient.GivenName,_patient.DateOfBirth,"F","","");
-            var sut = new PostPatientParams.Handler(_patientService);
-
-            // Act
-            var response = await sut.Handle(command, new CancellationToken());
-
-            // Assert
-            response.Id.Should().Be(99);
-        }
-
-        [Fact]
-        public async Task PostPatientBody()
-        {
-            // Arrange
-            var command = new PostPatientBody.Command(_patient);
-            var sut = new PostPatientBody.Handler(_patientService);
+            var command = new PostPatient.Command(_patient);
+            var sut = new PostPatient.Handler(_patientService);
 
             // Act
             var response = await sut.Handle(command, new CancellationToken());

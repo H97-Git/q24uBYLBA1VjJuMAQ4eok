@@ -72,34 +72,11 @@ namespace PatientDemographics.Tests.Controller
         public async Task PostAsync_ShouldAddEntity()
         {
             // Arrange
-            var date = DateTime.Now.Subtract(new TimeSpan(24, 0, 0));
-            var patientDto = new PatientDto { Id = 99, DateOfBirth = date};
-            _mediator.Send(Arg.Any<PostPatientParams.Command>()).Returns(patientDto);
-
-            // Act
-            var actionResult = await _sut.PostAsync("Blazor", "MediatR", date, "F", "", "");
-
-            // Assert
-            if (actionResult.Result is CreatedAtActionResult result)
-            {
-                result.StatusCode.Should().Be(201);
-                if (result.Value is PatientDto value)
-                {
-                    value.Id.Should().Be(99);
-                    value.DateOfBirth.Should().Be(date);
-                }
-            }
-        }
-
-        [Fact]
-        public async Task PostBodyAsync_ShouldAddEntity()
-        {
-            // Arrange
             var patientDto = new PatientDto { Id = 99 };
-            _mediator.Send(Arg.Any<PostPatientBody.Command>()).Returns(patientDto);
+            _mediator.Send(Arg.Any<PostPatient.Command>()).Returns(patientDto);
 
             // Act
-            var command = new PostPatientBody.Command(patientDto);
+            var command = new PostPatient.Command(patientDto);
             var actionResult = await _sut.PostBodyAsync(command);
 
             // Assert
