@@ -36,7 +36,7 @@ namespace PatientDemographics.Tests.Features.Handlers
             var response = await handler.Handle(query, new CancellationToken());
 
             // Assert
-            response.PatientsDto.Count.Should().Be(1);
+            response.PatientsDto.Should().HaveCount(1);
         }
 
         [Fact]

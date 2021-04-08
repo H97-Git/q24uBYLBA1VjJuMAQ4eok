@@ -40,7 +40,7 @@ namespace PatientHistory.Tests.Controller
                 result.StatusCode.Should().Be(200);
                 if (result.Value is List<NoteDto> value)
                 {
-                    value.Count.Should().Be(1);
+                    value.Should().HaveCount(1);
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace PatientDemographics.Tests.Infrastructure.Repositories
             var patients = await sut.GetPatient();
 
             // Assert
-            patients.Count.Should().Be(6);
+            patients.Should().HaveCount(6);
         }
         [Fact]
         public async Task GetPatient_ShouldReturnPatient_WhenDoesExist()

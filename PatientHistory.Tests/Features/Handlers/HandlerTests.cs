@@ -37,7 +37,7 @@ namespace PatientHistory.Tests.Features.Handlers
             var response = await handler.Handle(query, new CancellationToken());
 
             // Assert
-            response.NotesDto.Count.Should().Be(1);
+            response.NotesDto.Should().HaveCount(1);
         }
 
         [Fact]
