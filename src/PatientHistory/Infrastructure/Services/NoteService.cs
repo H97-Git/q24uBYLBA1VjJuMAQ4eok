@@ -4,7 +4,6 @@ using PatientHistory.Infrastructure.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mapster;
-using Microsoft.AspNetCore.Http;
 
 namespace PatientHistory.Infrastructure.Services
 {

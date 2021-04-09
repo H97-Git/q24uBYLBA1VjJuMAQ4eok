@@ -68,8 +68,10 @@ namespace PatientDemographics.Tests.Controller
             }
         }
 
-        [Fact]
-        public async Task PostAsync_ShouldAddEntity()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task PostAsync_ShouldAddEntity(bool body)
         {
             // Arrange
             var patientDto = new PatientDto { Id = 99 };
@@ -77,7 +79,7 @@ namespace PatientDemographics.Tests.Controller
 
             // Act
             var command = new PostPatient.Command(patientDto);
-            var actionResult = await _sut.PostBodyAsync(command);
+            var actionResult = body ? await _sut.PostAsync(command) : await _sut.PostBodyAsync(command);
 
             // Assert
             if (actionResult.Result is CreatedAtActionResult result)
@@ -89,6 +91,7 @@ namespace PatientDemographics.Tests.Controller
                 }
             }
         }
+        
 
         [Fact]
         public async Task PutAsync_ShouldUpdateEntity()

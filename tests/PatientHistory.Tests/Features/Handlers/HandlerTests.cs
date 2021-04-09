@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
-using PatientHistory.Data;
 using PatientHistory.Data.DTO;
 using PatientHistory.Features.Command;
 using PatientHistory.Features.Queries;

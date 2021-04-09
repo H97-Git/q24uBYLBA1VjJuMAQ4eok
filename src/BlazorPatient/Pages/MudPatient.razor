@@ -10,7 +10,6 @@
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Variant="Variant.Text" Typo="Typo.h6">No patient found.</MudText>
-                <MudProgressCircular Color="Color.Default" Indeterminate="true" />
             </CardHeaderContent>
         </MudCardHeader>
     </MudCard>
@@ -51,36 +50,36 @@ else
             </MudTd>
         </RowTemplate>
     </MudTable>
-    <br />
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Add / Edit Patient</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudTextField @bind-Value="_patient.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true"></MudTextField>
-            <MudTextField @bind-Value="_patient.GivenName" Label="Given Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-            <MudTextField @bind-Value="_patient.FamilyName" Label="Family Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-            <MudDatePicker @bind-Date="_patient.DateOfBirth"
-                           Color="Color.Warning"
-                           Label="Date Of Birth"
-                           MinDate="DateTime.Now.Subtract(new TimeSpan(876600,0,0))"
-                           PickerVariant="PickerVariant.Dialog"
-                           TitleDateFormat="dd MMM" />
-            <MudSelect @bind-Value="_patient.Gender" Label="Gender" Variant="Variant.Text" Margin="Margin.Normal">
-                @foreach (Gender item in Enum.GetValues(typeof(Gender)))
-                    {
-                        <MudSelectItem T="Gender?" Value="@item"/>
-                    }
-            </MudSelect>
-            <MudTextField @bind-Value="_patient.HomeAddress" Label="Home Address" Variant="Variant.Text" Margin="Margin.Normal"/>
-            <MudTextField @bind-Value="_patient.PhoneNumber" Label="Phone Number" Variant="Variant.Text" Margin="Margin.Normal"/>
-            <br />
-            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SavePatient">Save Patient</MudButton>
-        </MudCardContent>
-    </MudCard>
 }
+<br />
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Patient</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField @bind-Value="_patient.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true"></MudTextField>
+        <MudTextField @bind-Value="_patient.GivenName" Label="Given Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="_patient.FamilyName" Label="Family Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+        <MudDatePicker @bind-Date="_patient.DateOfBirth"
+                       Color="Color.Warning"
+                       Label="Date Of Birth"
+                       MinDate="DateTime.Now.Subtract(new TimeSpan(876600,0,0))"
+                       PickerVariant="PickerVariant.Dialog"
+                       TitleDateFormat="dd MMM" />
+        <MudSelect @bind-Value="_patient.Gender" Label="Gender" Variant="Variant.Text" Margin="Margin.Normal">
+            @foreach (Gender item in Enum.GetValues(typeof(Gender)))
+            {
+                <MudSelectItem T="Gender?" Value="@item" />
+            }
+        </MudSelect>
+        <MudTextField @bind-Value="_patient.HomeAddress" Label="Home Address" Variant="Variant.Text" Margin="Margin.Normal" />
+        <MudTextField @bind-Value="_patient.PhoneNumber" Label="Phone Number" Variant="Variant.Text" Margin="Margin.Normal" />
+        <br />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SavePatient">Save Patient</MudButton>
+    </MudCardContent>
+</MudCard>
 <br />
 @if (_notes.Count is 0)
 {
@@ -99,9 +98,9 @@ else
             <MudText Typo="Typo.h6">Note</MudText>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString"
-                           Adornment="Adornment.Start"
-                           AdornmentIcon="@Icons.Material.Filled.Search"
-                           IconSize="Size.Medium" Class="mt-0">
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0">
                 Placeholder="Search for notes..."
             </MudTextField>
         </ToolBarContent>
@@ -121,30 +120,51 @@ else
             </MudTd>
         </RowTemplate>
     </MudTable>
-    <br />
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h6">Add / Edit Note</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudTextField @bind-Value="_note.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true"/>
-             <MudSelect @bind-Value="_note.PatientId" Label="Patient Id" Variant="Variant.Text" Margin="Margin.Normal">
-                @foreach (var item in _patients)
-                    {
-                    <MudSelectItem T="int" Value="@item.Id" />
-                    }
-            </MudSelect>
-            <MudTextField @bind-Value="_note.Message" Label="Message" Margin="Margin.Normal" Variant="Variant.Text"/>
-            <br />
-            <MudButton Color="Color.Success" OnClick="SaveNote" Variant="Variant.Filled">Save Note</MudButton>
-        </MudCardContent>
-    </MudCard>
+}
+<br />
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Note</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField @bind-Value="_note.Id" Label="@selectLabel" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true" />
+        <MudSelect @bind-Value="_note.PatientId" Label="@selectLabel" Variant="Variant.Text" Margin="Margin.Normal">
+            @foreach (var item in _patients)
+            {
+                <MudSelectItem T="int" Value="@item.Id" @onmouseover="ChangeSelectLabel" />
+            }
+        </MudSelect>
+        <MudTextField @bind-Value="_note.Message" Label="Message" Margin="Margin.Normal" Variant="Variant.Text" />
+        <br />
+        <MudButton Color="Color.Success" OnClick="SaveNote" Variant="Variant.Filled">Save Note</MudButton>
+    </MudCardContent>
+</MudCard>
+
+<p>@mousePointerMessage</p>
+@for (var i = 0; i < 4; i++)
+{
+    <p>
+        <button @onclick="ReportPointerLocation">
+            Where's my mouse pointer for this button?
+        </button>
+    </p>
+}
+
+
+@code {
+    private string mousePointerMessage;
+
+    private void ReportPointerLocation(MouseEventArgs e)
+    {
+        mousePointerMessage = $"Mouse coordinates: {e.ScreenX}:{e.ScreenY}";
+    }
 }
 
 @code{
     private string searchString = "";
+    private string selectLabel;
     private PatientDto _patient = new();
     private NoteDto _note = new();
     private List<PatientDto> _patients = new();
@@ -153,6 +173,11 @@ else
     {
         _patients = await PatientService.Get();
         _notes = await NoteService.Get();
+    }
+
+    private void ChangeSelectLabel(MouseEventArgs e)
+    {
+        selectLabel = $"Mouse coordinates: {e.ScreenX}:{e.ScreenY}";
     }
 
     private bool SearchPatient(PatientDto patientParam)
