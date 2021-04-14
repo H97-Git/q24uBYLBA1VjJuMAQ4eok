@@ -77,7 +77,7 @@ else
         <MudTextField @bind-Value="_patient.HomeAddress" Label="Home Address" Variant="Variant.Text" Margin="Margin.Normal" />
         <MudTextField @bind-Value="_patient.PhoneNumber" Label="Phone Number" Variant="Variant.Text" Margin="Margin.Normal" />
         <br />
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SavePatient">Save Patient</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="SavePatient">Save Patient</MudButton>
     </MudCardContent>
 </MudCard>
 <br />
@@ -138,29 +138,9 @@ else
         </MudSelect>
         <MudTextField @bind-Value="_note.Message" Label="Message" Margin="Margin.Normal" Variant="Variant.Text" />
         <br />
-        <MudButton Color="Color.Success" OnClick="SaveNote" Variant="Variant.Filled">Save Note</MudButton>
+        <MudButton Color="Color.Info" OnClick="SaveNote" Variant="Variant.Filled">Save Note</MudButton>
     </MudCardContent>
 </MudCard>
-
-<p>@mousePointerMessage</p>
-@for (var i = 0; i < 4; i++)
-{
-    <p>
-        <button @onclick="ReportPointerLocation">
-            Where's my mouse pointer for this button?
-        </button>
-    </p>
-}
-
-
-@code {
-    private string mousePointerMessage;
-
-    private void ReportPointerLocation(MouseEventArgs e)
-    {
-        mousePointerMessage = $"Mouse coordinates: {e.ScreenX}:{e.ScreenY}";
-    }
-}
 
 @code{
     private string searchString = "";

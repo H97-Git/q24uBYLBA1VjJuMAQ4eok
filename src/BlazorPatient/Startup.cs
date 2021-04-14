@@ -1,10 +1,13 @@
+using System.Linq;
 using BlazorPatient.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
+using Serilog;
 
 namespace BlazorPatient
 {
@@ -21,18 +24,24 @@ namespace BlazorPatient
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            Log.Information("Startup : ConfigureServices() ...");
             services.AddRazorPages();
             services.AddControllersWithViews();
             services.AddServerSideBlazor();
             services.AddMudServices();
             services.AddHttpClient();
-            services.AddScoped<IPatientService,PatientService>();
-            services.AddScoped<INoteService,NoteService>();
+            services.AddScoped<IPatientService, PatientService>();
+            services.AddScoped<INoteService, NoteService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Log.Information("Startup : ConfigureServices() ...");
+
+            var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
+            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

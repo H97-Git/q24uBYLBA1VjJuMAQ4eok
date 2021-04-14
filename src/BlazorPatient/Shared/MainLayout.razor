@@ -1,19 +1,88 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <div class="content px-4">
-            @Body
-        </div>
-    </div>
-</div>
-<MudThemeProvider />
+<MudThemeProvider Theme="_currentTheme" />
 <MudSnackbarProvider />
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton 
+            Color="Color.Inherit" 
+            Edge="Edge.Start" 
+            Icon="@Icons.Material.Filled.Menu" 
+            OnClick="DrawerToggle" />
+        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudAppBarSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Brightness4" OnClick="DarkMode" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent Class="mainContent">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code{
+    MudTheme _currentTheme = new();
+    bool _drawerOpen = true;
+
+    protected override void OnInitialized()
+    {
+        _currentTheme = _defaultTheme;
+    }
+
+    void DarkMode()
+    {
+        if (_currentTheme == _defaultTheme)
+        {
+            _currentTheme = _darkTheme;
+        }
+        else
+        {
+            _currentTheme = _defaultTheme;
+        }
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    readonly MudTheme _defaultTheme = new()
+    {
+        Palette = new Palette()
+        {
+            Background = "#eeeeeb",
+            BackgroundGrey = "#d8d8d0",
+            Surface = "#edebea",
+            DrawerBackground = "#edebea",
+            DrawerText = "rgba(255,255,255, 0.80)",
+            DrawerIcon = "rgba(255,255,255, 0.80)",
+            AppbarBackground = "#424ec6",
+            AppbarText = "#fff",
+            TextPrimary = "rgba(0,0,0, 0.70)",
+            TextSecondary = "rgba(0,0,0, 0.50)",
+            ActionDefault = "#fff",
+            Info = "#424ec6"
+        }
+    };
+    readonly MudTheme _darkTheme = new()
+    {
+        Palette = new Palette()
+        {
+            Black = "#27272f",
+            Background = "#32333d",
+            BackgroundGrey = "#27272f",
+            Surface = "#373740",
+            DrawerBackground = "#27272f",
+            DrawerText = "rgba(255,255,255, 0.50)",
+            DrawerIcon = "rgba(255,255,255, 0.50)",
+            AppbarBackground = "#27272f",
+            AppbarText = "rgba(255,255,255, 0.70)",
+            TextPrimary = "rgba(255,255,255, 0.70)",
+            TextSecondary = "rgba(255,255,255, 0.50)",
+            ActionDefault = "#adadb1",
+            ActionDisabled = "rgba(255,255,255, 0.26)",
+            ActionDisabledBackground = "rgba(255,255,255, 0.12)"
+        }
+    };
+}
