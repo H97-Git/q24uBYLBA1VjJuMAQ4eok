@@ -1,14 +1,15 @@
-﻿@inherits LayoutComponentBase
+﻿@using Serilog
+@inherits LayoutComponentBase
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <MudThemeProvider Theme="_currentTheme" />
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton 
-            Color="Color.Inherit" 
-            Edge="Edge.Start" 
-            Icon="@Icons.Material.Filled.Menu" 
-            OnClick="DrawerToggle" />
+        <MudIconButton Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       Icon="@Icons.Material.Filled.Menu"
+                       OnClick="DrawerToggle" />
         <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
         <MudAppBarSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4" OnClick="DarkMode" />
@@ -24,21 +25,39 @@
 @code{
     MudTheme _currentTheme = new();
     bool _drawerOpen = true;
+    //bool _darkMode = false;
 
     protected override void OnInitialized()
     {
         _currentTheme = _defaultTheme;
+        //Log.Information(_darkMode.ToString());
     }
 
-    void DarkMode()
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        var darkMode = await LocalStorage.GetItemAsync<bool>("DarkMode");
+    //        if (darkMode)
+    //        {
+    //            await DarkMode();
+    //            _darkMode = true;
+    //            Log.Information(_darkMode.ToString());
+    //        }
+    //    }
+    //}
+
+    async Task DarkMode()
     {
         if (_currentTheme == _defaultTheme)
         {
             _currentTheme = _darkTheme;
+            await LocalStorage.SetItemAsync("DarkMode", true);
         }
         else
         {
             _currentTheme = _defaultTheme;
+            await LocalStorage.SetItemAsync("DarkMode", false);
         }
     }
 
@@ -57,12 +76,14 @@
             DrawerBackground = "#edebea",
             DrawerText = "rgba(255,255,255, 0.80)",
             DrawerIcon = "rgba(255,255,255, 0.80)",
-            AppbarBackground = "#424ec6",
+            AppbarBackground = "#594AE2",
             AppbarText = "#fff",
             TextPrimary = "rgba(0,0,0, 0.70)",
             TextSecondary = "rgba(0,0,0, 0.50)",
             ActionDefault = "#fff",
-            Info = "#424ec6"
+            Info = "#594AE2",
+            Primary = "#594AE2"
+
         }
     };
     readonly MudTheme _darkTheme = new()
@@ -82,7 +103,8 @@
             TextSecondary = "rgba(255,255,255, 0.50)",
             ActionDefault = "#adadb1",
             ActionDisabled = "rgba(255,255,255, 0.26)",
-            ActionDisabledBackground = "rgba(255,255,255, 0.12)"
+            ActionDisabledBackground = "rgba(255,255,255, 0.12)",
+            Primary = "#2196F3"
         }
     };
 }

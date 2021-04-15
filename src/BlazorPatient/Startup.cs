@@ -1,4 +1,5 @@
 using System.Linq;
+using Blazored.LocalStorage;
 using BlazorPatient.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +33,7 @@ namespace BlazorPatient
             services.AddHttpClient();
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<INoteService, NoteService>();
+            services.AddBlazoredLocalStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

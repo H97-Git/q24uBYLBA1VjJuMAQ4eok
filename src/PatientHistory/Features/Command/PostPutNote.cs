@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Mapster;
-using MediatR;
-using PatientHistory.Data;
+﻿using MediatR;
 using PatientHistory.Data.DTO;
 using PatientHistory.Infrastructure.Services;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentValidation;
+using Serilog;
 
 namespace PatientHistory.Features.Command
 {
@@ -24,22 +24,29 @@ namespace PatientHistory.Features.Command
 
             public async Task<NoteDto> Handle(Command command, CancellationToken cancellationToken)
             {
-                PostPut(command);
+                try
+                {
+                    PostPut(command);
+                }
+                catch (ValidationException ex)
+                {
+                    Log.Information(ex.Message);
+                    throw;
+                }
                 return await Task.FromResult(_noteService.Get(command.Id));
             }
 
             public void PostPut(Command command)
             {
                 (var notedDto, string id) = command;
-                var note = notedDto.Adapt<Note>();
                 switch (id)
                 {
                     case "0":
-                        note.CreatedTime = DateTime.Now;
-                        _noteService.Create(note);
+                        notedDto.CreatedTime = DateTime.Now;
+                        _noteService.Create(notedDto);
                         break;
                     default:
-                        _noteService.Update(id, note);
+                        _noteService.Update(id, notedDto);
                         break;
                 }
             }

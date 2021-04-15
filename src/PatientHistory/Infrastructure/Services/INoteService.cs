@@ -10,8 +10,8 @@ namespace PatientHistory.Infrastructure.Services
         List<NoteDto> Get();
         List<NoteDto> GetByPatientId(int patientId);
         NoteDto Get(string id);
-        Task Create(Note note);
-        void Update(string id, Note note);
+        Task Create(NoteDto note);
+        void Update(string id, NoteDto note);
         void Remove(string id);
     }
 }

@@ -1,39 +1,36 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Driver;
 using PatientHistory.Data;
+using Serilog;
 
 namespace PatientHistory.Infrastructure.Repositories
 {
     public class NoteRepository : INoteRepository
     {
-        private readonly IMongoCollection<Note> _notes;
-
-        public NoteRepository(INoteDbSettings settings)
+        private readonly NoteContext _context;
+        public NoteRepository(NoteContext context)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-
-            _notes = database.GetCollection<Note>(settings.NotesCollectionName);
+            _context = context;
         }
 
         public List<Note> Get() =>
-             _notes.Find(n => true).ToList();
+             _context.Notes.Find(n => true).ToList();
 
         public Note Get(string id) =>
-            _notes.Find(n => n.Id == id).FirstOrDefault();
+            _context.Notes.Find(n => n.Id == id).FirstOrDefault();
 
         public Note Create(Note note)
         {
-            _notes.InsertOne(note);
+            _context.Notes.InsertOne(note);
             return note;
         }
 
         public void Update(string id, Note note)
         {
-            _notes.ReplaceOne(n => n.Id == id, note);
+            _context.Notes.ReplaceOne(n => n.Id == id, note);
         }
 
         public void Remove(string id) =>
-            _notes.DeleteOne(n => n.Id == id);
+            _context.Notes.DeleteOne(n => n.Id == id);
     }
 }

@@ -1,0 +1,125 @@
+﻿@page "/Patients/{PatientId:int}"
+@using BlazorPatient.DTO
+@inject Infrastructure.Services.INoteService NoteService
+@inject Infrastructure.Services.IPatientService PatientService
+@inject ISnackbar SnackBar
+@inject NavigationManager NavigationManager
+
+@if (_notes.Count is 0)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Variant="Variant.Text" Typo="Typo.h6">No patient notes/history found.</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+    </MudCard>
+}
+else
+{
+    <MudTable Elevation="25" Items="_notes" Filter="new Func<NoteDto, bool>(SearchNote)" @bind-note="_note" Dense="true" Hover="true" Striped="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Note</MudText>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0">
+                Placeholder="Search for notes..."
+            </MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>PatientId</MudTh>
+            <MudTh>Message</MudTh>
+            <MudTh>Created Time</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="PatientId">@context.PatientId</MudTd>
+            <MudTd DataLabel="Message">@context.Message</MudTd>
+            <MudTd DataLabel="CreatedTime">@context.CreatedTime</MudTd>
+            <MudTd DataLabel="">
+                <MudFab @onclick="@(()=>EditNote(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+<br />
+<MudCard Elevation="25">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Note</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField @bind-Value="_note.Message" Label="Message" Margin="Margin.Normal" Variant="Variant.Text" Lines="5" />
+        <br />
+        <MudButton Color="Color.Info" OnClick="SaveNote" Variant="Variant.Filled">Save Note</MudButton>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public int PatientId { get; set; }
+
+    private NoteDto _note = new();
+    private List<NoteDto> _notes = new();
+    private List<PatientDto> _patients = new();
+    private string searchString = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _notes = await NoteService.Get();
+        _patients = await PatientService.Get();
+        if (_patients.All(x => x.Id != PatientId))
+        {
+            SnackBar.Add($"Patient n° {PatientId} not found.", Severity.Error);
+            NavigationManager.NavigateTo("/Patients");
+        }
+    }
+
+
+    private bool SearchNote(NoteDto noteDto)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        return noteDto.Id.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+               || noteDto.PatientId.Equals(int.Parse(searchString))
+               || noteDto.Message.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+    }
+
+
+    private async Task GetNotes()
+    {
+        _notes = await NoteService.Get();
+    }
+
+
+    private async Task SaveNote()
+    {
+        _note.PatientId = PatientId;
+        int result = await NoteService.Save(_note);
+        var cacheNote = _note;
+        _note = new NoteDto();
+        switch (result)
+        {
+            case 0:
+                SnackBar.Add("Something went wrong.", Severity.Error);
+                _note = cacheNote;
+                break;
+            case 1:
+                SnackBar.Add("Note Saved.", Severity.Success);
+                break;
+            case 2:
+                SnackBar.Add("Note Updated.", Severity.Success);
+                break;
+        }
+        await GetNotes();
+    }
+
+
+    private void EditNote(string id)
+    {
+        _note = _notes.FirstOrDefault(p => p.Id == id);
+    }
+}

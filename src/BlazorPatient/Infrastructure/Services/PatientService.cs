@@ -27,7 +27,6 @@ namespace BlazorPatient.Infrastructure.Services
             try
             {
                 var apiResponse = await _client.GetAsync("/Patient/");
-
                 if (!apiResponse.IsSuccessStatusCode)
                     return new List<PatientDto>();
 
@@ -35,9 +34,9 @@ namespace BlazorPatient.Infrastructure.Services
                 var patients = JsonConvert.DeserializeObject<List<PatientDto>>(content);
                 return patients;
             }
-            catch(HttpRequestException exception)
+            catch (HttpRequestException exception)
             {
-                Log.Error("Api can't be reached : {message}",exception.Message);
+                Log.Error("Api can't be reached : {message}", exception.Message);
                 return new List<PatientDto>();
             }
         }
@@ -59,7 +58,7 @@ namespace BlazorPatient.Infrastructure.Services
             }
             catch (HttpRequestException exception)
             {
-                Log.Error("Api can't be reached : {message}",exception.Message);
+                Log.Error("Api can't be reached : {message}", exception.Message);
                 return 0;
             }
         }

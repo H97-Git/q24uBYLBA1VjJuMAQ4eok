@@ -14,8 +14,10 @@ using PatientDemographics.Infrastructure.Services;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using MediatR;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace PatientDemographics
 {
@@ -95,6 +97,10 @@ namespace PatientDemographics
         {
             Log.Information("Startup : Configure()");
             app.UseSerilogRequestLogging();
+
+            var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
+            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
+
 
             app.UseExceptionHandler(builder =>
             {

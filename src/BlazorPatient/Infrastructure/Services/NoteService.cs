@@ -14,8 +14,6 @@ namespace BlazorPatient.Infrastructure.Services
     {
         private readonly HttpClient _client;
 
-        private record Command(NoteDto NoteDto);
-
         public NoteService(IHttpClientFactory httpClientFactory)
         {
             _client = httpClientFactory.CreateClient();
@@ -36,29 +34,29 @@ namespace BlazorPatient.Infrastructure.Services
             }
             catch (HttpRequestException exception)
             {
-                Log.Error("Api can't be reached : {message}",exception.Message); 
+                Log.Error("Api can't be reached : {message}", exception.Message);
                 return new List<NoteDto>();
             }
         }
 
         public async Task<int> Save(NoteDto noteDto)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(new Command(noteDto)), Encoding.UTF8);
+            var content = new StringContent(JsonConvert.SerializeObject(noteDto), Encoding.UTF8);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             try
             {
-                var apiResponse = noteDto.Id == string.Empty
+                var apiResponse = noteDto.Id is null
                     ? await _client.PostAsync("/Note/add", content)
                     : await _client.PutAsync("/Note/edit/" + noteDto.Id, content);
 
                 return apiResponse.IsSuccessStatusCode ? noteDto.Id == string.Empty ? 1 : 2 : 0;
-                //IsSuccesStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2
-                //IsSuccesStatusCode = false ? Something went wrong return 0
+                //IsSuccessStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2
+                //IsSuccessStatusCode = false ? Something went wrong return 0
             }
             catch (HttpRequestException exception)
             {
-                Log.Error("Api can't be reached : {message}",exception.Message);
+                Log.Error("Api can't be reached : {message}", exception.Message);
                 return 0;
             }
         }

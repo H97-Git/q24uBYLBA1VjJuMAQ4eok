@@ -5,6 +5,7 @@ using PatientHistory.Features.Command;
 using PatientHistory.Features.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace PatientHistory.Controllers
 {
@@ -70,7 +71,7 @@ namespace PatientHistory.Controllers
         /// The <see cref="NoteDto"/> The note created.
         /// </returns>
         [HttpPost("add")]
-        public async Task<ActionResult<NoteDto>> PostAsync(NoteDto noteDto)
+        public async Task<ActionResult<NoteDto>> PostAsync([FromBody] NoteDto noteDto)
         {
             var command = new PostPutNote.Command(noteDto);
             var result = await _mediator.Send(command);

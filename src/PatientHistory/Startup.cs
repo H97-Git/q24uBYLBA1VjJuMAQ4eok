@@ -7,15 +7,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using PatientHistory.Data;
 using PatientHistory.Infrastructure.Repositories;
 using PatientHistory.Infrastructure.Services;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace PatientHistory
 {
@@ -34,14 +36,16 @@ namespace PatientHistory
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
 
-            services.Configure<NoteDbSettings>(Configuration.GetSection(nameof(NoteDbSettings)));
-            services.AddSingleton<INoteDbSettings>(sp =>
-                sp.GetRequiredService<IOptions<NoteDbSettings>>().Value);
-
             services.AddHttpClient();
-            services.AddSingleton<INoteRepository, NoteRepository>();
-            services.AddSingleton<INoteService, NoteService>();
+            services.AddTransient<INoteRepository, NoteRepository>();
+            services.AddTransient<INoteService, NoteService>();
             services.AddSingleton<IPatientService, PatientService>();
+
+            services.AddSingleton<IMongoClient>(serviceProvider =>
+                new MongoClient(Configuration["NoteDbSettings:ConnectionString"]));
+            services.AddScoped(serviceProvider =>
+                new NoteContext(serviceProvider.GetRequiredService<IMongoClient>(),
+                Configuration["NoteDbSettings:DatabaseName"]));
 
             services.AddSwaggerGen(swaggerGenOptions =>
             {
@@ -64,7 +68,6 @@ namespace PatientHistory
                 string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 swaggerGenOptions.IncludeXmlComments(xmlPath);
             });
-
             services.AddMediatR(typeof(Startup).Assembly);
         }
 
@@ -72,6 +75,10 @@ namespace PatientHistory
         {
             Log.Information("Startup : Configure()");
             app.UseSerilogRequestLogging();
+
+            var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
+            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
+
 
             app.UseExceptionHandler(builder =>
             {
