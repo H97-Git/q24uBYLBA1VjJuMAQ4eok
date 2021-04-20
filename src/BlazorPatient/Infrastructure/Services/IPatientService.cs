@@ -8,5 +8,6 @@ namespace BlazorPatient.Infrastructure.Services
     {
         Task<List<PatientDto>> Get();
         Task<int> Save(PatientDto patientDto);
+        public string ErrorMessage { get; set; }
     }
 }

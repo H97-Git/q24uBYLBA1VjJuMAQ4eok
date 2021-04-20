@@ -5,7 +5,6 @@ using PatientHistory.Features.Command;
 using PatientHistory.Features.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Serilog;
 
 namespace PatientHistory.Controllers
 {
@@ -75,7 +74,7 @@ namespace PatientHistory.Controllers
         {
             var command = new PostPutNote.Command(noteDto);
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetByIdAsync), new { result?.Id }, result);
+            return CreatedAtAction(nameof(GetByIdAsync), new { result.Id }, result);
 
         }
 

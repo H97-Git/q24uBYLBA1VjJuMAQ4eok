@@ -3,8 +3,18 @@
 @inject Infrastructure.Services.IPatientService PatientService
 @inject ISnackbar SnackBar
 @inject NavigationManager NavigationManager
-
-@if (_patients.Count is 0)
+@if (_patients is null)
+{
+    <MudCard Elevation="25">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+                <MudText Variant="Variant.Text" Typo="Typo.h6">Loading ...</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+    </MudCard>
+}
+else if (_patients.Count is 0)
 {
     <MudCard Elevation="25">
         <MudCardHeader>
@@ -16,11 +26,11 @@
 }
 else
 {
-    <MudTable T="PatientDto" Elevation="25" Items="_patients" Filter="new Func<PatientDto, bool>(SearchPatient)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true" OnRowClick="@(args => OnRowClicked(args))">
+    <MudTable id="PatientTable" T="PatientDto" Elevation="25" Items="_patients" Filter="new Func<PatientDto, bool>(SearchPatient)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true" OnRowClick="@(args => OnRowClicked(args))">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Patient</MudText>
+            <MudText Typo="Typo.h6">Patients</MudText>
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString"
+            <MudTextField @bind-Value="_searchString"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           Placeholder="Search for Patient..."
@@ -28,7 +38,6 @@ else
             </MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id</MudTh>
             <MudTh>Given Name</MudTh>
             <MudTh>Family Name</MudTh>
             <MudTh>Date Of Birth</MudTh>
@@ -38,15 +47,16 @@ else
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="GivenName">@context.GivenName</MudTd>
-            <MudTd DataLabel="FamilyName">@context.FamilyName</MudTd>
-            <MudTd DataLabel="DateOfBirth">@context.DateOfBirth</MudTd>
-            <MudTd DataLabel="Gender">@context.Gender</MudTd>
-            <MudTd DataLabel="HomeAddress">@context.HomeAddress</MudTd>
-            <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>
-            <MudTd DataLabel="">
-                <MudFab @onclick="@(()=>EditPatient(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudTd>@context.GivenName</MudTd>
+            <MudTd>@context.FamilyName</MudTd>
+            <MudTd>@GetPatientDate(context)</MudTd>
+            <MudTd>@context.Gender</MudTd>
+            <MudTd Class="homeAddress">@context.HomeAddress</MudTd>
+            <MudTd>@context.PhoneNumber</MudTd>
+            <MudTd>
+                <MudTooltip Text="Edit">
+                    <MudFab @onclick="@(()=>EditPatient(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                </MudTooltip>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -55,7 +65,7 @@ else
 <MudCard Elevation="25">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.h6">Add / Edit Patient</MudText>
+            <MudText Typo="Typo.h6">@_cardHeaderString</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
@@ -82,21 +92,32 @@ else
 </MudCard>
 
 @code{
-    private string searchString = "";
+    private string _searchString;
+    private string _cardHeaderString = "Add a patient :";
     private PatientDto _patient = new();
+    private PatientDto _cachePatient = new();
     private List<PatientDto> _patients = new();
 
     protected override async Task OnInitializedAsync()
     {
         _patients = await PatientService.Get();
+        if (PatientService.ErrorMessage != "")
+        {
+            SnackBar.Add(PatientService.ErrorMessage,Severity.Error);
+        }
+    }
+
+    private string GetPatientDate(PatientDto patientDto)
+    {
+        return patientDto.DateOfBirth != null ? patientDto.DateOfBirth.Value.ToShortDateString() : "";
     }
 
     private bool SearchPatient(PatientDto patientParam)
     {
-        if (string.IsNullOrWhiteSpace(searchString)) return true;
-        return patientParam.GivenName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-               || patientParam.FamilyName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-               || patientParam.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        return patientParam.GivenName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+               || patientParam.FamilyName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+               || patientParam.PhoneNumber.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
     }
     private async Task GetPatients()
     {
@@ -104,14 +125,15 @@ else
     }
     private async Task SavePatient()
     {
+        _cardHeaderString = "Add a patient :";
         int result = await PatientService.Save(_patient);
-        var cachePatient = _patient;
         _patient = new PatientDto();
         switch (result)
         {
             case 0:
                 SnackBar.Add("Something went wrong.", Severity.Error);
-                _patient = cachePatient;
+                SnackBar.Add(PatientService.ErrorMessage);
+                _patient = _cachePatient;
                 break;
             case 1:
                 SnackBar.Add("Patient Saved.", Severity.Success);
@@ -125,7 +147,9 @@ else
 
     private void EditPatient(int id)
     {
+        _cardHeaderString = "Edit a patient :";
         _patient = _patients.FirstOrDefault(p => p.Id == id);
+        _cachePatient = _patient;
     }
 
     private void OnRowClicked(TableRowClickEventArgs<PatientDto> args)

@@ -69,6 +69,7 @@ namespace PatientHistory
                 swaggerGenOptions.IncludeXmlComments(xmlPath);
             });
             services.AddMediatR(typeof(Startup).Assembly);
+            //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(NoteValidatorBehaviour<,>));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -90,6 +91,11 @@ namespace PatientHistory
                     string exType = ex.GetType().Name;
                     switch (exType)
                     {
+                        case "MongoWriteException":
+                            await context.Response
+                                .WriteAsJsonAsync(new { Error = "Mongo Exception", ex.Message });
+                            Log.Error(ex, "MongoWriteException");
+                            return;
                         case "KeyNotFoundException":
                             await context.Response
                                 .WriteAsJsonAsync(new { Error = "Resources not found in the system.", Id = ex.Message });
@@ -97,9 +103,9 @@ namespace PatientHistory
                             return;
                         case "ValidationException":
                             var validationException = (ValidationException)ex;
-                            Log.Error(ex.Message, "Validation Exception");
                             await context.Response
                                 .WriteAsJsonAsync(new { validationException.Errors });
+                            Log.Error(ex.Message, "Validation Exception");
                             return;
                         default:
                             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -120,6 +126,8 @@ namespace PatientHistory
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            //app.UseMiddleware<NoteExceptionHandlerMiddleware>();
 
             app.UseAuthorization();
 

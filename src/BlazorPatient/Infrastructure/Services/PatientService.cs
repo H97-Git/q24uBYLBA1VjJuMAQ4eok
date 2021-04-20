@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog;
@@ -12,14 +13,14 @@ namespace BlazorPatient.Infrastructure.Services
 {
     public class PatientService : IPatientService
     {
-        private readonly HttpClient _client;
-
+        public string ErrorMessage { get; set; }
         private record Command(PatientDto PatientDto);
-
+        private readonly HttpClient _client;
         public PatientService(IHttpClientFactory httpClientFactory)
         {
             _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri("https://localhost:5001");
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            _client.BaseAddress = isWindows ? new Uri("https://localhost:5001") : new Uri("http://localhost:80");
 
         }
         public async Task<List<PatientDto>> Get()
@@ -36,21 +37,28 @@ namespace BlazorPatient.Infrastructure.Services
             }
             catch (HttpRequestException exception)
             {
-                Log.Error("Api can't be reached : {message}", exception.Message);
+                HandleHttpRequestException(exception);
                 return new List<PatientDto>();
             }
         }
 
         public async Task<int> Save(PatientDto patientDto)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(new Command(patientDto)), Encoding.UTF8);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            using var addContent =
+                new StringContent(JsonConvert.SerializeObject(new Command(patientDto)), Encoding.UTF8)
+                { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
+            using var editContent =
+                new StringContent(JsonConvert.SerializeObject(patientDto), Encoding.UTF8)
+                { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
 
             try
             {
                 var apiResponse = patientDto.Id == 0
-                    ? await _client.PostAsync("/Patient/addBody", content)
-                    : await _client.PutAsync("/Patient/edit/" + patientDto.Id, content);
+                    ? await _client.PostAsync("/Patient/addBody", addContent)
+                    : await _client.PutAsync("/Patient/edit/" + patientDto.Id, editContent);
+
+                string content = await apiResponse.Content.ReadAsStringAsync();
+                ErrorMessage = JsonConvert.DeserializeObject(content)?.ToString();
 
                 return apiResponse.IsSuccessStatusCode ? patientDto.Id == 0 ? 1 : 2 : 0;
                 //IsSuccesStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2
@@ -58,10 +66,15 @@ namespace BlazorPatient.Infrastructure.Services
             }
             catch (HttpRequestException exception)
             {
-                Log.Error("Api can't be reached : {message}", exception.Message);
+                HandleHttpRequestException(exception);
                 return 0;
             }
         }
 
+        private void HandleHttpRequestException(HttpRequestException ex)
+        {
+            ErrorMessage = "Api can't be reached.";
+            Log.Error("Api can't be reached : {message}", ex.Message);
+        }
     }
 }

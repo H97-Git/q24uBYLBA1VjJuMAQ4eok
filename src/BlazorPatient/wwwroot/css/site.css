@@ -5,7 +5,9 @@
 html, body {
     font-family: 'Montserrat', sans-serif;
 }
-
+#PatientTable tr {
+    cursor: pointer;
+}
 .mainContent {
     padding: 85px;
 }
@@ -17,6 +19,9 @@ html, body {
 a {
     color: var(--mud-palette-text-primary);
     text-decoration: none !important;
+}
+a:hover {
+    color: var(--mud-palette-white);
 }
 
 .alert:hover a{
@@ -94,17 +99,6 @@ a {
         background-color: var(--mud-palette-drawer-text);
         color: var(--mud-palette-text-secondary);
     }
-
-@media (min-width: 641px) {
-    .navbar-toggler {
-        display: none;
-    }
-
-    .collapse {
-        /* Never collapse the sidebar for wide screens */
-        display: block;
-    }
-}
 /*#endregion*/
 
 /* #region Reconnect modal text & link*/
@@ -116,3 +110,15 @@ a {
     color: red;
 }
 /* #endregion */
+
+@media (min-width: 650px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        /* Never collapse the sidebar for wide screens */
+        display: block;
+    }
+
+}

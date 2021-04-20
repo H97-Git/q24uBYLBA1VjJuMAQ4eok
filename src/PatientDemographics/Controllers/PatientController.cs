@@ -85,15 +85,17 @@ namespace PatientDemographics.Controllers
         /// <summary>
         /// Update a patient.
         /// </summary>
-        /// <param name="command"> The command with the id and data of a patient.</param>
+        /// <param name="id">The id of a patient.</param>
+        /// <param name="patientDto">The date of the up to date patient.</param>
         /// <returns>
         /// The <see cref="ActionResult{PatientDto}"/> The patient updated.
         /// </returns>
-        [HttpPut("edit")]
+        [HttpPut("edit/{id}")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PatientDto>> PutAsync([FromBody] PutPatient.Command command)
+        public async Task<ActionResult<PatientDto>> PutAsync(int id, [FromBody] PatientDto patientDto)
         {
+            var command = new PutPatient.Command(id, patientDto);
             var result = await _mediator.Send(command);
             return Ok(result);
         }

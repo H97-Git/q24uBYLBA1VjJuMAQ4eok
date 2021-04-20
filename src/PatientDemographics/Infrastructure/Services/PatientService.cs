@@ -35,7 +35,7 @@ namespace PatientDemographics.Infrastructure.Services
                 : patient.Adapt<PatientDto>();
         }
 
-        public async Task UpdatePatient(PatientDto patientDto)
+        public async Task UpdatePatient(int id,PatientDto patientDto)
         {
             var validationResult = await _patientValidator.ValidateAsync(patientDto);
             if (!validationResult.IsValid)
@@ -43,7 +43,7 @@ namespace PatientDemographics.Infrastructure.Services
                 throw new ValidationException(validationResult.ToString(), validationResult.Errors);
             }
 
-            var patient = await _patientRepository.GetPatient(patientDto.Id);
+            var patient = await _patientRepository.GetPatient(id);
             if (patient is null)
             {
                 throw new KeyNotFoundException($"{patientDto.Id}");

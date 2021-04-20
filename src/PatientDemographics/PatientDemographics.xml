@@ -39,11 +39,12 @@
             The <see cref="T:PatientDemographics.Data.DTO.PatientDto"/> The patient created.
             </returns>
         </member>
-        <member name="M:PatientDemographics.Controllers.PatientController.PutAsync(PatientDemographics.Features.Commands.PutPatient.Command)">
+        <member name="M:PatientDemographics.Controllers.PatientController.PutAsync(System.Int32,PatientDemographics.Data.DTO.PatientDto)">
             <summary>
             Update a patient.
             </summary>
-            <param name="command"> The command with the id and data of a patient.</param>
+            <param name="id">The id of a patient.</param>
+            <param name="patientDto">The date of the up to date patient.</param>
             <returns>
             The <see cref="T:Microsoft.AspNetCore.Mvc.ActionResult`1"/> The patient updated.
             </returns>

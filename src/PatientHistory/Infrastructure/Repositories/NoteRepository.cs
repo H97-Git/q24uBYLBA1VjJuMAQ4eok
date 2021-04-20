@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MongoDB.Driver;
 using PatientHistory.Data;
 using Serilog;
@@ -19,10 +20,19 @@ namespace PatientHistory.Infrastructure.Repositories
         public Note Get(string id) =>
             _context.Notes.Find(n => n.Id == id).FirstOrDefault();
 
-        public Note Create(Note note)
+        public string Create(Note note)
         {
-            _context.Notes.InsertOne(note);
-            return note;
+            try
+            {
+                _context.Notes.InsertOne(note);
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex.Message);
+                throw;
+            }
+
+            return note.Id;
         }
 
         public void Update(string id, Note note)

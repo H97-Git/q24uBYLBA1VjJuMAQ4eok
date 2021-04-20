@@ -7,7 +7,7 @@ namespace PatientHistory.Infrastructure.Repositories
     {
         List<Note> Get();
         Note Get(string id);
-        Note Create(Note note);
+        string Create(Note note);
         void Update(string id, Note note);
         void Remove(string id);
     }

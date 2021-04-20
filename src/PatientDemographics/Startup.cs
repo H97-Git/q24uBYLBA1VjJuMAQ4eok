@@ -1,7 +1,9 @@
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,18 +16,18 @@ using PatientDemographics.Infrastructure.Services;
 using Serilog;
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using MediatR;
-using Microsoft.AspNetCore.Hosting.Server.Features;
+using System.Runtime.InteropServices;
 
 namespace PatientDemographics
 {
     public class Startup
     {
+        private readonly bool _isWindows;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
         public IConfiguration Configuration { get; }
@@ -40,9 +42,10 @@ namespace PatientDemographics
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
 
+            string connectionString = _isWindows ? "PatientDB" : "DockerPatientDb";
             services.AddDbContext<PatientContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("PatientDB")));
+                    Configuration.GetConnectionString(connectionString)));
 
             services.AddSwaggerGen(swaggerGenOptions =>
             {
@@ -91,6 +94,12 @@ namespace PatientDemographics
             });
 
             services.AddMediatR(typeof(Startup).Assembly);
+
+            //services.AddHttpsRedirection(options =>
+            //{
+            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+            //    options.HttpsPort = 5001;
+            //});
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -99,7 +108,10 @@ namespace PatientDemographics
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
-            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
+            foreach (string item in urls)
+            {
+                Log.Information("URl : {0}", item);
+            }
 
 
             app.UseExceptionHandler(builder =>
@@ -119,9 +131,9 @@ namespace PatientDemographics
                             return;
                         case "ValidationException":
                             var validationException = (ValidationException)ex;
-                            Log.Error(ex.Message,"Validation Exception");
+                            Log.Error(ex.Message, "Validation Exception");
                             await context.Response
-                                .WriteAsJsonAsync(new { validationException.Errors });
+                                .WriteAsJsonAsync(new { Errors = validationException.Errors });
                             return;
                         default:
                             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -138,7 +150,22 @@ namespace PatientDemographics
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Patient Demographics v1"));
             }
-            app.UseHttpsRedirection();
+
+            if (_isWindows)
+            {
+                app.UseHttpsRedirection();
+            }
+            else
+            {
+                app.Use(async (context, next) =>
+                {
+                    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
+                    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
+                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                    await next.Invoke();
+                });
+            }
+
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

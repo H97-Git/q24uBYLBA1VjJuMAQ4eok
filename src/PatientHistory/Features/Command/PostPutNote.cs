@@ -4,8 +4,6 @@ using PatientHistory.Infrastructure.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation;
-using Serilog;
 
 namespace PatientHistory.Features.Command
 {
@@ -24,30 +22,21 @@ namespace PatientHistory.Features.Command
 
             public async Task<NoteDto> Handle(Command command, CancellationToken cancellationToken)
             {
-                try
-                {
-                    PostPut(command);
-                }
-                catch (ValidationException ex)
-                {
-                    Log.Information(ex.Message);
-                    throw;
-                }
-                return await Task.FromResult(_noteService.Get(command.Id));
+                string id = await PostPut(command);
+                return _noteService.Get(id);
             }
 
-            public void PostPut(Command command)
+            public async Task<string> PostPut(Command command)
             {
                 (var notedDto, string id) = command;
                 switch (id)
                 {
                     case "0":
                         notedDto.CreatedTime = DateTime.Now;
-                        _noteService.Create(notedDto);
-                        break;
+                        return await _noteService.Create(notedDto);
                     default:
                         _noteService.Update(id, notedDto);
-                        break;
+                        return id;
                 }
             }
         }

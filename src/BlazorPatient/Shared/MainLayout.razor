@@ -1,6 +1,6 @@
-﻿@using Serilog
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider Theme="_currentTheme" />
 <MudSnackbarProvider />
@@ -10,7 +10,8 @@
                        Edge="Edge.Start"
                        Icon="@Icons.Material.Filled.Menu"
                        OnClick="DrawerToggle" />
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudFab Color="Color.Primary" Icon="@Icons.Material.Rounded.Home" 
+                IconSize="Size.Large" Label="Health Clinics" Size="Size.Large" Link="/" />
         <MudAppBarSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4" OnClick="DarkMode" />
     </MudAppBar>
@@ -25,12 +26,15 @@
 @code{
     MudTheme _currentTheme = new();
     bool _drawerOpen = true;
-    //bool _darkMode = false;
 
     protected override void OnInitialized()
     {
         _currentTheme = _defaultTheme;
-        //Log.Information(_darkMode.ToString());
+    }
+
+    void GoHome()
+    {
+        NavigationManager.NavigateTo("/");
     }
 
     //protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -70,7 +74,7 @@
     {
         Palette = new Palette()
         {
-            Background = "#eeeeeb",
+            Background = "#ecf0f1",
             BackgroundGrey = "#d8d8d0",
             Surface = "#edebea",
             DrawerBackground = "#edebea",

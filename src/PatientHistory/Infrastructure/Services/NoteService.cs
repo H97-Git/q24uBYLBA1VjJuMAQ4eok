@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Mapster;
 using PatientHistory.Internal;
-using Serilog;
 
 namespace PatientHistory.Infrastructure.Services
 {
@@ -27,6 +26,7 @@ namespace PatientHistory.Infrastructure.Services
         {
             var notes = _noteRepository.Get();
             var dto = notes.Adapt<List<NoteDto>>();
+
             return dto;
         }
 
@@ -37,8 +37,8 @@ namespace PatientHistory.Infrastructure.Services
             {
                 throw new KeyNotFoundException($"{id}");
             }
-
             var dto = note.Adapt<NoteDto>();
+
             return dto;
         }
 
@@ -46,15 +46,11 @@ namespace PatientHistory.Infrastructure.Services
         {
             var notes = Get();
             var notesByPatient = notes.FindAll(x => x.PatientId == patientId);
-            if (notesByPatient.Count is 0)
-            {
-                throw new KeyNotFoundException($"{patientId}");
-            }
 
             return notesByPatient;
         }
 
-        public async Task Create(NoteDto noteDto)
+        public async Task<string> Create(NoteDto noteDto)
         {
             var validationResult = await _noteValidator.ValidateAsync(noteDto);
 
@@ -68,9 +64,9 @@ namespace PatientHistory.Infrastructure.Services
             {
                 throw new KeyNotFoundException($"{noteDto.PatientId}");
             }
-
             var note = noteDto.Adapt<Note>();
-            _noteRepository.Create(note);
+
+            return _noteRepository.Create(note);
         }
 
         public void Update(string id, NoteDto noteDto)

@@ -8,7 +8,7 @@ namespace PatientDemographics.Features.Commands
 {
     public static class PutPatient
     {
-        public record Command(PatientDto PatientDto) : IRequest<PatientDto>;
+        public record Command(int Id,PatientDto PatientDto) : IRequest<PatientDto>;
 
         public class Handler : IRequestHandler<Command, PatientDto>
         {
@@ -21,7 +21,7 @@ namespace PatientDemographics.Features.Commands
 
             public async Task<PatientDto> Handle(Command command, CancellationToken cancellationToken)
             {
-                await _patientService.UpdatePatient(command.PatientDto);
+                await _patientService.UpdatePatient(command.Id ,command.PatientDto);
                 return await _patientService.GetPatient(command.PatientDto.Id);
             }
         }

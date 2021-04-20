@@ -4,6 +4,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using System.Runtime.InteropServices;
 
 namespace BlazorPatient
 {
@@ -42,7 +43,16 @@ namespace BlazorPatient
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     webBuilder.UseStartup<Startup>();
+                    if (isWindows)
+                    {
+                        webBuilder.UseUrls("http://localhost:5004", "https://localhost:5005");
+                    }
+                    else
+                    {
+                        webBuilder.UseUrls("http://0.0.0.0:5004", "https://0.0.0.0:5005");
+                    }
                 });
     }
 }

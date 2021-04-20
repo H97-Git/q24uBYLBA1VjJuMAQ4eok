@@ -8,7 +8,7 @@ namespace PatientDemographics.Infrastructure.Services
     {
         Task<List<PatientDto>> GetPatient();
         Task<PatientDto> GetPatient(int id);
-        Task UpdatePatient(PatientDto patientDto);
+        Task UpdatePatient(int id,PatientDto patientDto);
         Task SavePatient(PatientDto patientDto);
     }
 }
