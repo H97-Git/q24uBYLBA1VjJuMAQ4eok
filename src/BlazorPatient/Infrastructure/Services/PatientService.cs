@@ -1,5 +1,4 @@
-﻿using BlazorPatient.DTO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -7,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using BlazorPatient.Models;
 using Serilog;
 
 namespace BlazorPatient.Infrastructure.Services
@@ -14,7 +14,7 @@ namespace BlazorPatient.Infrastructure.Services
     public class PatientService : IPatientService
     {
         public string ErrorMessage { get; set; }
-        private record Command(PatientDto PatientDto);
+        private record Command(PatientModel PatientDto);
         private readonly HttpClient _client;
         public PatientService(IHttpClientFactory httpClientFactory)
         {
@@ -23,26 +23,26 @@ namespace BlazorPatient.Infrastructure.Services
             _client.BaseAddress = isWindows ? new Uri("https://localhost:5001") : new Uri("http://localhost:80");
 
         }
-        public async Task<List<PatientDto>> Get()
+        public async Task<List<PatientModel>> Get()
         {
             try
             {
                 var apiResponse = await _client.GetAsync("/Patient/");
                 if (!apiResponse.IsSuccessStatusCode)
-                    return new List<PatientDto>();
+                    return new List<PatientModel>();
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                var patients = JsonConvert.DeserializeObject<List<PatientDto>>(content);
+                var patients = JsonConvert.DeserializeObject<List<PatientModel>>(content);
                 return patients;
             }
             catch (HttpRequestException exception)
             {
                 HandleHttpRequestException(exception);
-                return new List<PatientDto>();
+                return new List<PatientModel>();
             }
         }
 
-        public async Task<int> Save(PatientDto patientDto)
+        public async Task<int> Save(PatientModel patientDto)
         {
             using var addContent =
                 new StringContent(JsonConvert.SerializeObject(new Command(patientDto)), Encoding.UTF8)

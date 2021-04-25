@@ -2,76 +2,57 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PatientDemographics.Data;
-using PatientDemographics.Infrastructure.Repositories;
-using PatientDemographics.Infrastructure.Services;
+using PatientAssessment.Internal;
 using Serilog;
+using System.Linq;
 using System.Runtime.InteropServices;
-using PatientDemographics.Internal;
+using PatientAssessment.Infrastructure.Services;
 
-namespace PatientDemographics
+namespace PatientAssessment
 {
     public class Startup
     {
-        private readonly bool _isWindows;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
         public IConfiguration Configuration { get; }
 
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             Log.Information("Startup : ConfigureServices()");
-
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
-
-            services.AddTransient<IPatientRepository, PatientRepository>();
-            services.AddTransient<IPatientService, PatientService>();
-
-            string connectionString = _isWindows ? "PatientDB" : "DockerPatientDb";
-            services.AddDbContext<PatientContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString(connectionString)));
-
+            services.AddHttpClient();
+            services.AddSingleton<IAssessmentService, AssessmentService>();
             services.AddCustomSwagger();
-
             services.AddMediatR(typeof(Startup).Assembly);
-
-            //services.AddHttpsRedirection(options =>
-            //{
-            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-            //    options.HttpsPort = 5001;
-            //});
         }
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Log.Information("Startup : Configure()");
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
-            foreach (string item in urls)
-            {
-                Log.Information("URl : {0}", item);
-            }
+            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
 
             app.UseCustomExceptionHandler();
 
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
                 app.UseCustomSwagger();
             }
 
-            if (_isWindows)
+            //isWindows ?
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 app.UseHttpsRedirection();
             }
@@ -87,7 +68,9 @@ namespace PatientDemographics
             }
 
             app.UseRouting();
+
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();

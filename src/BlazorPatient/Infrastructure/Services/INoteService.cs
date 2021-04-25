@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BlazorPatient.DTO;
+using BlazorPatient.Models;
 
 namespace BlazorPatient.Infrastructure.Services
 {
     public interface INoteService
     {
-        //Task<List<NoteDto>> Get();
-        Task<List<NoteDto>> GetByPatientId(int patientId);
-        Task<int> Save(NoteDto noteDto);
+        Task<List<NoteModel>> GetByPatientId(int patientId);
+        Task<int> Save(NoteModel Note);
         public string ErrorMessage { get; set; }
     }
 }

@@ -61,8 +61,11 @@ a:hover {
     top: 0.5rem;
 }
 
-/*#region NavMenu*/
+.mud-card-header {
+    padding-bottom: 0px;
+}
 
+/*#region NavMenu*/
 .oi {
     width: 2rem;
     font-size: 1.1rem;

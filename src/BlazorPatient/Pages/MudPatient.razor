@@ -1,5 +1,5 @@
 ﻿@page "/Patients"
-@using BlazorPatient.DTO
+@using BlazorPatient.Models
 @inject Infrastructure.Services.IPatientService PatientService
 @inject ISnackbar SnackBar
 @inject NavigationManager NavigationManager
@@ -26,7 +26,7 @@ else if (_patients.Count is 0)
 }
 else
 {
-    <MudTable id="PatientTable" T="PatientDto" Elevation="25" Items="_patients" Filter="new Func<PatientDto, bool>(SearchPatient)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true" OnRowClick="@(args => OnRowClicked(args))">
+    <MudTable id="PatientTable" T="PatientModel" Elevation="25" Items="_patients" Filter="new Func<PatientModel, bool>(SearchPatient)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true" OnRowClick="@(args => OnRowClicked(args))">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Patients</MudText>
             <MudToolBarSpacer />
@@ -94,9 +94,9 @@ else
 @code{
     private string _searchString;
     private string _cardHeaderString = "Add a patient :";
-    private PatientDto _patient = new();
-    private PatientDto _cachePatient = new();
-    private List<PatientDto> _patients = new();
+    private PatientModel _patient = new();
+    private PatientModel _cachePatient = new();
+    private List<PatientModel> _patients = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,12 +107,12 @@ else
         }
     }
 
-    private string GetPatientDate(PatientDto patientDto)
+    private string GetPatientDate(PatientModel patientDto)
     {
         return patientDto.DateOfBirth != null ? patientDto.DateOfBirth.Value.ToShortDateString() : "";
     }
 
-    private bool SearchPatient(PatientDto patientParam)
+    private bool SearchPatient(PatientModel patientParam)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
         return patientParam.GivenName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
@@ -127,7 +127,7 @@ else
     {
         _cardHeaderString = "Add a patient :";
         int result = await PatientService.Save(_patient);
-        _patient = new PatientDto();
+        _patient = new PatientModel();
         switch (result)
         {
             case 0:
@@ -152,7 +152,7 @@ else
         _cachePatient = _patient;
     }
 
-    private void OnRowClicked(TableRowClickEventArgs<PatientDto> args)
+    private void OnRowClicked(TableRowClickEventArgs<PatientModel> args)
     {
         NavigationManager.NavigateTo($"/Patients/{args.Item.Id}");
     }

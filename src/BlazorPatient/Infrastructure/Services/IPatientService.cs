@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BlazorPatient.DTO;
+using BlazorPatient.Models;
 
 namespace BlazorPatient.Infrastructure.Services
 {
     public interface IPatientService
     {
-        Task<List<PatientDto>> Get();
-        Task<int> Save(PatientDto patientDto);
+        Task<List<PatientModel>> Get();
+        Task<int> Save(PatientModel patient);
         public string ErrorMessage { get; set; }
     }
 }

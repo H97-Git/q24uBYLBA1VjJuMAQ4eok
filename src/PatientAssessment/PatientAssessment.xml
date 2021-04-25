@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PatientAssessment</name>
+    </assembly>
+    <members>
+        <member name="M:PatientAssessment.Controllers.AssessmentController.GetByIdAsync(System.Int32)">
+            <summary>
+            Gets a patient assessment by id.
+            </summary>
+            <param name="patientId">The id of a patient.</param>
+            <returns>
+            The <see cref="T:PatientAssessment.Data.Assessment"/> A patient assessment.
+            </returns>
+        </member>
+    </members>
+</doc>

@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using PatientHistory.Data;
 
-namespace PatientHistory
+namespace PatientAssessment
 {
     public class Program
     {
@@ -21,26 +20,10 @@ namespace PatientHistory
                 .Enrich.FromLogContext()
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
-
             try
             {
-                Log.Information("Main : Building web host...");
-                var host = CreateHostBuilder(args).Build();
-
-                using var scope = host.Services.CreateScope();
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = services.GetRequiredService<NoteContext>();
-                    DbInitializer.Initialize(context);
-                }
-                catch (Exception ex)
-                {
-                    Log.Fatal(ex, "Main : An error occurred while seeding the database.");
-                }
-
-                Log.Information("Main : Running web host...");
-                host.Run();
+                Log.Information("Main : Building+Running web host...");
+                CreateHostBuilder(args).Build().Run();
                 return 0;
             }
             catch (Exception ex)
@@ -59,7 +42,16 @@ namespace PatientHistory
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     webBuilder.UseStartup<Startup>();
+                    if (isWindows)
+                    {
+                        webBuilder.UseUrls("http://localhost:5004", "https://localhost:5005");
+                    }
+                    else
+                    {
+                        webBuilder.UseUrls("http://0.0.0.0:5004", "https://0.0.0.0:5005");
+                    }
                 });
     }
 }

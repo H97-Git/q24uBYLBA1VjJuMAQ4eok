@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace BlazorPatient.DTO
+namespace BlazorPatient.Models
 {
-    public class NoteDto
+    public class NoteModel
     {
         public string Id { get; set; }
 

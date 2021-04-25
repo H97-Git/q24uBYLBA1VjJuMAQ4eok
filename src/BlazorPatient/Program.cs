@@ -43,15 +43,15 @@ namespace BlazorPatient
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     webBuilder.UseStartup<Startup>();
-                    if (isWindows)
+                    //isWindows ?
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        webBuilder.UseUrls("http://localhost:5004", "https://localhost:5005");
+                        webBuilder.UseUrls("http://localhost:6000", "https://localhost:6001");
                     }
                     else
                     {
-                        webBuilder.UseUrls("http://0.0.0.0:5004", "https://0.0.0.0:5005");
+                        webBuilder.UseUrls("http://0.0.0.0:6000", "https://0.0.0.0:6001");
                     }
                 });
     }

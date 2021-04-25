@@ -1,12 +1,12 @@
 using Blazored.LocalStorage;
 using BlazorPatient.Infrastructure.Services;
+using BlazorPatient.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MudBlazor.Services;
 using Serilog;
 using System.Runtime.InteropServices;
 
@@ -14,11 +14,9 @@ namespace BlazorPatient
 {
     public class Startup
     {
-        private readonly bool _isWindows;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
         public IConfiguration Configuration { get; }
@@ -28,13 +26,13 @@ namespace BlazorPatient
         public void ConfigureServices(IServiceCollection services)
         {
             Log.Information("Startup : ConfigureServices() ...");
-            services.AddRazorPages();
-            services.AddControllersWithViews();
-            services.AddServerSideBlazor();
-            services.AddMudServices();
+
+            services.AddCustomBlazorService();
+
             services.AddHttpClient();
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<INoteService, NoteService>();
+            services.AddScoped<IAssessmentService, AssessmentService>();
             services.AddBlazoredLocalStorage();
 
             //services.AddHttpsRedirection(options =>
@@ -66,7 +64,8 @@ namespace BlazorPatient
                 app.UseHsts();
             }
 
-            if (_isWindows)
+            //isWindows ?
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 app.UseHttpsRedirection();
             }
