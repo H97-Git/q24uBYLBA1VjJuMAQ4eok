@@ -11,8 +11,6 @@ using PatientHistory.Infrastructure.Repositories;
 using PatientHistory.Infrastructure.Services;
 using PatientHistory.Internal;
 using Serilog;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace PatientHistory
 {
@@ -27,7 +25,7 @@ namespace PatientHistory
 
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Information("Startup : ConfigureServices()");
+            Log.Debug("Startup : ConfigureServices()");
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
 
@@ -41,48 +39,42 @@ namespace PatientHistory
             services.AddScoped(serviceProvider =>
                 new NoteContext(serviceProvider.GetRequiredService<IMongoClient>(),
                 Configuration["NoteDbSettings:DatabaseName"]));
-
+            services.AddCors();
             services.AddCustomSwagger();
-
             services.AddMediatR(typeof(Startup).Assembly);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Information("Startup : Configure()");
+            Log.Debug("Startup : Configure()");
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
-            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
-
+            foreach (string item in urls)
+            {
+                Log.Debug("URl : {0}", item);
+            }
             app.UseCustomExceptionHandler();
 
+            app.UseHttpsRedirection();
+                app.UseCustomSwagger();
             if (env.IsDevelopment())
             {
                 //app.UseDeveloperExceptionPage();
-                app.UseCustomSwagger();
             }
-
-            //isWindows ?
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                app.UseHttpsRedirection();
-            }
-            else
-            {
-                app.Use(async (context, next) =>
-                {
-                    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
-                    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
-                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                    await next.Invoke();
-                });
-            }
-
+            //else
+            //{
+            //    app.Use(async (context, next) =>
+            //    {
+            //        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
+            //        context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
+            //        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            //        await next.Invoke();
+            //    });
+            //}
+            app.UseCors();
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();

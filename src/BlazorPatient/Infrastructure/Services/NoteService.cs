@@ -1,39 +1,40 @@
-﻿using System;
+﻿using BlazorPatient.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using BlazorPatient.Models;
-using Newtonsoft.Json;
-using Serilog;
 
 namespace BlazorPatient.Infrastructure.Services
 {
     public class NoteService : INoteService
     {
-        private readonly HttpClient _client;
+        public IConfiguration Configuration { get; }
         public string ErrorMessage { get; set; }
+        private readonly HttpClient _client;
 
-        public NoteService(IHttpClientFactory httpClientFactory)
+        public NoteService(IHttpClientFactory httpClientFactory,IHostEnvironment env, IConfiguration configuration)
         {
+            Configuration = configuration;
             _client = httpClientFactory.CreateClient();
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            _client.BaseAddress = isWindows ? new Uri("https://localhost:5003") : new Uri("http://localhost:80");
-
+            _client.BaseAddress =  new Uri(Configuration["BlazorPatient:NoteService:BaseAddress"]);
         }
 
         public async Task<List<NoteModel>> GetByPatientId(int patientId)
         {
             try
             {
-                var apiResponse = await _client.GetAsync("/Note/patient/" + patientId);
+                var apiResponse = await _client.GetAsync(Configuration["BlazorPatient:NoteService:Endpoint:Get"] + patientId);
                 if (!apiResponse.IsSuccessStatusCode)
                     return new List<NoteModel>();
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                var notes = JsonConvert.DeserializeObject<List<NoteModel>>(content);
+                var notes = JsonSerializer.Deserialize<List<NoteModel>>(content);
                 return notes;
             }
             catch (HttpRequestException exception)
@@ -45,17 +46,17 @@ namespace BlazorPatient.Infrastructure.Services
 
         public async Task<int> Save(NoteModel note)
         {
-            var addContent = new StringContent(JsonConvert.SerializeObject(note), Encoding.UTF8);
+            var addContent = new StringContent(JsonSerializer.Serialize(note), Encoding.UTF8);
             addContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             try
             {
                 var apiResponse = note.Id is null
-                    ? await _client.PostAsync("/Note/add", addContent)
-                    : await _client.PutAsync("/Note/edit/" + note.Id, addContent);
+                    ? await _client.PostAsync(Configuration["BlazorPatient:NoteService:Endpoint:Post"], addContent)
+                    : await _client.PutAsync(Configuration["BlazorPatient:NoteService:Endpoint:Put"] + note.Id, addContent);
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                ErrorMessage = JsonConvert.DeserializeObject(content)?.ToString();
+                ErrorMessage = JsonSerializer.Deserialize<string>(content);
 
                 return apiResponse.IsSuccessStatusCode ? note.Id is null ? 1 : 2 : 0;
                 //IsSuccessStatusCode = true && NoteModel.Id is null ? - It's a Save return 1 : NoteModel.Id is not null - It's an Update return 2

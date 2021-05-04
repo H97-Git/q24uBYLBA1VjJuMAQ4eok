@@ -33,7 +33,7 @@ namespace PatientHistory.Internal
                         case "ValidationException":
                             var validationException = (ValidationException)ex;
                             await context.Response
-                                .WriteAsJsonAsync(new { validationException.Errors });
+                                .WriteAsJsonAsync(new { Error = "Validation Exception", validationException.Errors });
                             Log.Error(ex.Message, "Validation Exception");
                             return;
                         default:

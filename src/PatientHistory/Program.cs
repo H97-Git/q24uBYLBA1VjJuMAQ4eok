@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PatientHistory.Data;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using PatientHistory.Data;
 
 namespace PatientHistory
 {
@@ -24,9 +24,8 @@ namespace PatientHistory
 
             try
             {
-                Log.Information("Main : Building web host...");
+                Log.Debug("Main : Building web host...");
                 var host = CreateHostBuilder(args).Build();
-
                 using var scope = host.Services.CreateScope();
                 var services = scope.ServiceProvider;
                 try
@@ -39,7 +38,7 @@ namespace PatientHistory
                     Log.Fatal(ex, "Main : An error occurred while seeding the database.");
                 }
 
-                Log.Information("Main : Running web host...");
+                Log.Debug("Main : Running web host...");
                 host.Run();
                 return 0;
             }

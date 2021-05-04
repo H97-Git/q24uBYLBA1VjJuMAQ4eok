@@ -1,6 +1,6 @@
-﻿using System;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Serilog;
+using System;
 
 namespace PatientHistory.Data
 {
@@ -10,7 +10,8 @@ namespace PatientHistory.Data
         {
             Log.Information("DbInitializer : Initialize()");
 
-            if (context.Notes.Find(x => true).CountDocuments() is not 0)
+            var list = context.Notes.Find(x => true).ToList();
+            if (list.Count is not 0)
             {
                 return;
             }
@@ -193,9 +194,8 @@ namespace PatientHistory.Data
                     Message = "Patient states that they are not experiencing any problems\nLab reports Microalbumin elevated"
                 },
             };
-            context.Notes.InsertMany(notes);
-
             Log.Information("DbInitializer : Seeding Db ...");
+            context.Notes.InsertMany(notes);
         }
     }
 }

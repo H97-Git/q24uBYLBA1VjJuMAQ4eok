@@ -6,7 +6,6 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
-using System.Runtime.InteropServices;
 
 namespace PatientDemographics
 {
@@ -24,10 +23,8 @@ namespace PatientDemographics
                 .CreateLogger();
             try
             {
-                Log.Information("Main : Building web host...");
-
+                Log.Debug("Main : Building web host...");
                 var host = CreateHostBuilder(args).Build();
-
                 using var scope = host.Services.CreateScope();
                 var services = scope.ServiceProvider;
                 try
@@ -60,16 +57,7 @@ namespace PatientDemographics
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     webBuilder.UseStartup<Startup>();
-                    if (isWindows)
-                    {
-                        webBuilder.UseUrls("http://localhost:5000", "https://localhost:5001");
-                    }
-                    else
-                    {
-                        webBuilder.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:5001");
-                    }
                 });
         }
     }

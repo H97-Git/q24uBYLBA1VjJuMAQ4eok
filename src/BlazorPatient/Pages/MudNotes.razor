@@ -17,7 +17,7 @@
     </MudCardHeader>
     <MudCardContent>
         <MudText Variant="Variant.Text" Margin="Margin.Normal">Age : <MudText Color="Color.Primary" Inline="true">@_age</MudText></MudText>
-        <MudText Variant="Variant.Text" Margin="Margin.Normal">Date of Birth : <MudText Color="Color.Primary" Inline="true">@_patient.DateOfBirth </MudText></MudText>
+        <MudText Variant="Variant.Text" Margin="Margin.Normal">Date of Birth : <MudText Color="Color.Primary" Inline="true">@GetPatientDate(_patient.DateOfBirth) </MudText></MudText>
         <MudText Variant="Variant.Text" Margin="Margin.Normal">Gender : <MudText Color="Color.Primary" Inline="true">@_patient.Gender</MudText></MudText>
         <MudText Variant="Variant.Text" Margin="Margin.Normal">Home Address : <MudText Color="Color.Primary" Inline="true">@_patient.HomeAddress</MudText></MudText>
         <MudText Variant="Variant.Text" Margin="Margin.Normal">Phone Number : <MudText Color="Color.Primary" Inline="true">@_patient.PhoneNumber</MudText></MudText>
@@ -135,6 +135,8 @@ else
                 _riskLevelIcon = Icons.Material.Filled.Dangerous;
                 _riskLevelColor = Color.Error;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -178,6 +180,11 @@ else
     {
         _cardHeaderString = "Edit a note :";
         _note = _notes.FirstOrDefault(p => p.Id == id);
+    }
+
+    private static string GetPatientDate(DateTime? dateOfBirth)
+    {
+        return dateOfBirth != null ? dateOfBirth.Value.ToShortDateString() : "";
     }
 
     private int GetAge()

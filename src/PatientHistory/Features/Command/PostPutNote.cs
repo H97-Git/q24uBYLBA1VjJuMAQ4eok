@@ -31,9 +31,11 @@ namespace PatientHistory.Features.Command
                 (var notedDto, string id) = command;
                 switch (id)
                 {
+                    //If id (command.id) is "0" it's a save
                     case "0":
                         notedDto.CreatedTime = DateTime.Now;
                         return await _noteService.Create(notedDto);
+                    //otherwise it's an update.
                     default:
                         _noteService.Update(id, notedDto);
                         return id;

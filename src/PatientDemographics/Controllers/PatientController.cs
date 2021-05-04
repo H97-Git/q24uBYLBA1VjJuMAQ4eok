@@ -42,7 +42,7 @@ namespace PatientDemographics.Controllers
         /// <returns>
         /// The <see cref="PatientDto"/> A patient information.
         /// </returns>
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PatientDto>> GetByIdAsync(int id)
@@ -90,7 +90,7 @@ namespace PatientDemographics.Controllers
         /// <returns>
         /// The <see cref="ActionResult{PatientDto}"/> The patient updated.
         /// </returns>
-        [HttpPut("edit/{id}")]
+        [HttpPut("edit/{id:int}")]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(PatientDto), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PatientDto>> PutAsync(int id, [FromBody] PatientDto patientDto)

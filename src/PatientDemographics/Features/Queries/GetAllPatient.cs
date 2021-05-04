@@ -22,7 +22,7 @@ namespace PatientDemographics.Features.Queries
 
             public async Task<Response> Handle(Query query, CancellationToken cancellationToken)
             {
-                return new Response(await _patientService.GetPatient());
+                return new(await _patientService.GetPatient());
             }
         }
 

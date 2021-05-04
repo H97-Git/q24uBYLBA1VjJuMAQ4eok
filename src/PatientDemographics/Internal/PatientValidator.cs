@@ -50,7 +50,7 @@ namespace PatientDemographics.Internal
         private static bool BeWithinRange(DateTime dateOfBirth)
         {
             var age = DateTime.Today - dateOfBirth;
-            bool diff = age.TotalDays >= 0 && age.TotalDays <= 36500;
+            bool diff = age.TotalDays is >= 0 and <= 36500;
             return (diff);
         }
     }

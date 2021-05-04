@@ -23,7 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebUi", "WebUi", "{21DA0712
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{F3011DFE-EF9C-4A64-8B75-0B6FAA96E81E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientAssessment", "src\PatientAssessment\PatientAssessment.csproj", "{B5968C06-1589-408E-8E0D-9200499157F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PatientAssessment", "src\PatientAssessment\PatientAssessment.csproj", "{B5968C06-1589-408E-8E0D-9200499157F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientAssessment.Tests", "tests\PatientAssessment.Tests\PatientAssessment.Tests.csproj", "{91E5B8CE-86E5-42EC-874C-629D7EA06713}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{B5968C06-1589-408E-8E0D-9200499157F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5968C06-1589-408E-8E0D-9200499157F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5968C06-1589-408E-8E0D-9200499157F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91E5B8CE-86E5-42EC-874C-629D7EA06713}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91E5B8CE-86E5-42EC-874C-629D7EA06713}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91E5B8CE-86E5-42EC-874C-629D7EA06713}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91E5B8CE-86E5-42EC-874C-629D7EA06713}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +78,7 @@ Global
 		{21DA0712-730C-450E-A3E9-2E5411DA36C5} = {9086A05C-851B-4AAC-8901-AC39BB1F2956}
 		{F3011DFE-EF9C-4A64-8B75-0B6FAA96E81E} = {9086A05C-851B-4AAC-8901-AC39BB1F2956}
 		{B5968C06-1589-408E-8E0D-9200499157F1} = {F3011DFE-EF9C-4A64-8B75-0B6FAA96E81E}
+		{91E5B8CE-86E5-42EC-874C-629D7EA06713} = {12709F1B-6E17-4958-9740-AF90AF1D87EC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B0A533E3-7831-4947-87A5-2EBABF0C2FFA}

@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PatientAssessment.Infrastructure.Services;
 using PatientAssessment.Internal;
 using Serilog;
 using System.Linq;
-using System.Runtime.InteropServices;
-using PatientAssessment.Infrastructure.Services;
 
 namespace PatientAssessment
 {
@@ -22,7 +21,6 @@ namespace PatientAssessment
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             Log.Information("Startup : ConfigureServices()");
@@ -34,7 +32,6 @@ namespace PatientAssessment
             services.AddMediatR(typeof(Startup).Assembly);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             Log.Information("Startup : Configure()");
@@ -50,9 +47,8 @@ namespace PatientAssessment
                 app.UseDeveloperExceptionPage();
                 app.UseCustomSwagger();
             }
-
-            //isWindows ?
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            
+            if (env.IsDevelopment())
             {
                 app.UseHttpsRedirection();
             }

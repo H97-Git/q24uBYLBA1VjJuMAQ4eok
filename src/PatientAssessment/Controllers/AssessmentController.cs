@@ -6,7 +6,7 @@ using PatientAssessment.Features.Queries;
 
 namespace PatientAssessment.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class AssessmentController : ControllerBase
     {

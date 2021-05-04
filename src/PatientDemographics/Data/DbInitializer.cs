@@ -8,7 +8,7 @@ namespace PatientDemographics.Data
     {
         public static void Initialize(PatientContext context)
         {
-            Log.Information("DbInitializer : EnsureCreated()");
+            Log.Debug("DbInitializer : EnsureCreated()");
             context.Database.EnsureCreated();
 
             if (context.Patients.Any())
@@ -110,7 +110,7 @@ namespace PatientDemographics.Data
                 }
             };
 
-            Log.Information("DbInitializer : Seeding Db ...");
+            Log.Debug("DbInitializer : Seeding Db ...");
             foreach (var p in patients)
             {
                 context.Patients.Add(p);

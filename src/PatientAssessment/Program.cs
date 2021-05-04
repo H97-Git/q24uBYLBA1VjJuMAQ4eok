@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System;
 
 namespace PatientAssessment
 {
@@ -42,16 +41,7 @@ namespace PatientAssessment
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     webBuilder.UseStartup<Startup>();
-                    if (isWindows)
-                    {
-                        webBuilder.UseUrls("http://localhost:5004", "https://localhost:5005");
-                    }
-                    else
-                    {
-                        webBuilder.UseUrls("http://0.0.0.0:5004", "https://0.0.0.0:5005");
-                    }
                 });
     }
 }

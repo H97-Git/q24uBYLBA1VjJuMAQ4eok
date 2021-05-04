@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using Mapster;
 using PatientDemographics.Infrastructure.Repositories;
 using PatientDemographics.Internal;
@@ -35,8 +36,12 @@ namespace PatientDemographics.Infrastructure.Services
                 : patient.Adapt<PatientDto>();
         }
 
-        public async Task UpdatePatient(int id,PatientDto patientDto)
+        public async Task UpdatePatient(int id, PatientDto patientDto)
         {
+            if (patientDto == null)
+            {
+                throw new ArgumentNullException(nameof(patientDto));
+            }
             var validationResult = await _patientValidator.ValidateAsync(patientDto);
             if (!validationResult.IsValid)
             {
@@ -55,6 +60,10 @@ namespace PatientDemographics.Infrastructure.Services
 
         public async Task SavePatient(PatientDto patientDto)
         {
+            if (patientDto == null)
+            {
+                throw new ArgumentNullException(nameof(patientDto));
+            }
             var validationResult = await _patientValidator.ValidateAsync(patientDto);
 
             if (!validationResult.IsValid)

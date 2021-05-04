@@ -9,7 +9,7 @@ namespace PatientHistory.Features.Queries
 {
     public class GetAllNote
     {
-        public record Query() : IRequest<Response>;
+        public record Query : IRequest<Response>;
 
         public class Handler : IRequestHandler<Query, Response>
         {

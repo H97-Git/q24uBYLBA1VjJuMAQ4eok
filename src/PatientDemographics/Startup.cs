@@ -9,26 +9,25 @@ using Microsoft.Extensions.Hosting;
 using PatientDemographics.Data;
 using PatientDemographics.Infrastructure.Repositories;
 using PatientDemographics.Infrastructure.Services;
-using Serilog;
-using System.Runtime.InteropServices;
 using PatientDemographics.Internal;
+using Serilog;
 
 namespace PatientDemographics
 {
     public class Startup
     {
-        private readonly bool _isWindows;
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
-            _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Information("Startup : ConfigureServices()");
+            Log.Debug("Startup : ConfigureServices()");
 
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
@@ -36,56 +35,57 @@ namespace PatientDemographics
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
 
-            string connectionString = _isWindows ? "PatientDB" : "DockerPatientDb";
+            string connectionString = _env.IsDevelopment() ? "PatientDB" : "DockerPatientDb";
             services.AddDbContext<PatientContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString(connectionString)));
 
             services.AddCustomSwagger();
-
             services.AddMediatR(typeof(Startup).Assembly);
+            services.AddCors();
 
-            //services.AddHttpsRedirection(options =>
-            //{
-            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-            //    options.HttpsPort = 5001;
-            //});
+            //In production (Docker)
+            if (_env.IsProduction())
+            {
+                //    services.AddHttpsRedirection(options =>
+                //    {
+                //        options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                //        options.HttpsPort = 5001;
+                //    });
+            }
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            Log.Information("Startup : Configure()");
+            Log.Debug("Startup : Configure()");
+            Log.Debug($"EnvironmentName : {_env.EnvironmentName}");
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
             foreach (string item in urls)
             {
-                Log.Information("URl : {0}", item);
+                Log.Debug("URl : {0}", item);
             }
 
             app.UseCustomExceptionHandler();
+            app.UseCustomSwagger();
 
-            if (env.IsDevelopment())
-            {
-                //app.UseDeveloperExceptionPage();
-                app.UseCustomSwagger();
-            }
-
-            if (_isWindows)
+            if (_env.IsDevelopment())
             {
                 app.UseHttpsRedirection();
             }
-            else
-            {
-                app.Use(async (context, next) =>
-                {
-                    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
-                    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
-                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                    await next.Invoke();
-                });
-            }
-
+            //else
+            //{
+            //    //In production(Docker)
+            //    app.Use(async (context, next) =>
+            //    {
+            //        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
+            //        context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
+            //        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            //        await next.Invoke();
+            //    });
+            //}
+            app.UseCors();
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

@@ -65,6 +65,10 @@ a:hover {
     padding-bottom: 0px;
 }
 
+.mud-chip {
+    min-width: 125px;
+}
+
 /*#region NavMenu*/
 .oi {
     width: 2rem;

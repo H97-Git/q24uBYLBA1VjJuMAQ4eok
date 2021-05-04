@@ -1,38 +1,39 @@
-﻿using Newtonsoft.Json;
+﻿using BlazorPatient.Models;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using BlazorPatient.Models;
-using Serilog;
 
 namespace BlazorPatient.Infrastructure.Services
 {
     public class PatientService : IPatientService
     {
+        public IConfiguration Configuration { get; }
         public string ErrorMessage { get; set; }
-        private record Command(PatientModel PatientDto);
-        private readonly HttpClient _client;
-        public PatientService(IHttpClientFactory httpClientFactory)
-        {
-            _client = httpClientFactory.CreateClient();
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            _client.BaseAddress = isWindows ? new Uri("https://localhost:5001") : new Uri("http://localhost:80");
 
+        private readonly HttpClient _client;
+        private record Command(PatientModel PatientDto);
+        public PatientService(IHttpClientFactory httpClientFactory,IConfiguration configuration)
+        {
+            Configuration = configuration;
+            _client = httpClientFactory.CreateClient();
+            _client.BaseAddress = new Uri(Configuration["BlazorPatient:PatientService:BaseAddress"]);
         }
         public async Task<List<PatientModel>> Get()
         {
             try
             {
-                var apiResponse = await _client.GetAsync("/Patient/");
+                var apiResponse = await _client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
                 if (!apiResponse.IsSuccessStatusCode)
                     return new List<PatientModel>();
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                var patients = JsonConvert.DeserializeObject<List<PatientModel>>(content);
+                var patients = JsonSerializer.Deserialize<List<PatientModel>>(content);
                 return patients;
             }
             catch (HttpRequestException exception)
@@ -45,24 +46,24 @@ namespace BlazorPatient.Infrastructure.Services
         public async Task<int> Save(PatientModel patientDto)
         {
             using var addContent =
-                new StringContent(JsonConvert.SerializeObject(new Command(patientDto)), Encoding.UTF8)
+                new StringContent(JsonSerializer.Serialize(new Command(patientDto)), Encoding.UTF8)
                 { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
             using var editContent =
-                new StringContent(JsonConvert.SerializeObject(patientDto), Encoding.UTF8)
+                new StringContent(JsonSerializer.Serialize(patientDto), Encoding.UTF8)
                 { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
 
             try
             {
                 var apiResponse = patientDto.Id == 0
-                    ? await _client.PostAsync("/Patient/addBody", addContent)
-                    : await _client.PutAsync("/Patient/edit/" + patientDto.Id, editContent);
+                    ? await _client.PostAsync(Configuration["BlazorPatient:PatientService:Endpoint:Post"], addContent)
+                    : await _client.PutAsync(Configuration["BlazorPatient:PatientService:Endpoint:Put"] + patientDto.Id, editContent);
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                ErrorMessage = JsonConvert.DeserializeObject(content)?.ToString();
+                ErrorMessage = JsonSerializer.Deserialize<string>(content);
 
                 return apiResponse.IsSuccessStatusCode ? patientDto.Id == 0 ? 1 : 2 : 0;
-                //IsSuccesStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2
-                //IsSuccesStatusCode = false ? Something went wrong return 0
+                //IsSuccessStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2
+                //IsSuccessStatusCode = false ? Something went wrong return 0
             }
             catch (HttpRequestException exception)
             {

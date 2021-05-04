@@ -1,99 +1,71 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using PatientAssessment.Data;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using PatientAssessment.Data;
-using Serilog;
 
 namespace PatientAssessment.Infrastructure.Services
 {
     public class AssessmentService : IAssessmentService
     {
         private readonly IHttpClientFactory _clientFactory;
-        public AssessmentService(IHttpClientFactory clientFactory)
+        private static IConfiguration Configuration { get; set; }
+
+        public AssessmentService(IHttpClientFactory clientFactory, IConfiguration configuration)
         {
             _clientFactory = clientFactory;
+            Configuration = configuration;
         }
 
         public async Task<Assessment> GetAssessmentByPatientId(int patientId)
         {
-            Assessment assessment = new();
             var patientClient = _clientFactory.CreateClient();
-            patientClient.BaseAddress = new Uri("https://localhost:5001");
+            var noteClient = _clientFactory.CreateClient();
             try
             {
-                var patientApiResponse = await patientClient.GetAsync("/Patient/" + patientId);
-                string patientApiContent = await patientApiResponse.Content.ReadAsStringAsync();
-                if (patientApiResponse.IsSuccessStatusCode)
-                {
-                    var noteClient = _clientFactory.CreateClient();
-                    noteClient.BaseAddress = new Uri("https://localhost:5003");
-                    var noteApiResponse = await noteClient.GetAsync("/Note/patient/" + patientId);
+                string patientApiContent =
+                    await GetApiContent(patientClient, Configuration["AssessmentService:PatientBaseAddress"], Configuration["AssessmentService:Endpoint:Patient"], patientId);
+                if (patientApiContent is null) return null;
 
-                    string noteApiContent = await noteApiResponse.Content.ReadAsStringAsync();
-                    var notes = JsonConvert.DeserializeObject<List<NoteModel>>(noteApiContent);
-                    var patient = JsonConvert.DeserializeObject<PatientModel>(patientApiContent);
+                string noteApiContent =
+                    await GetApiContent(noteClient, Configuration["AssessmentService:NoteBaseAddress"], Configuration["AssessmentService:Endpoint:Note"], patientId);
+                if (noteApiContent is null) return null;
 
-                    assessment = MapPatient(assessment, patient);
-                    int triggerTerm = CountAssessmentTerm(notes);
-                    assessment.RiskLevel = SetAssessment(triggerTerm, assessment);
-                    return assessment;
-                }
+                var notes = JsonConvert.DeserializeObject<List<NoteModel>>(noteApiContent);
+                var patient = JsonConvert.DeserializeObject<PatientModel>(patientApiContent);
 
-                return assessment;
+                return CreateAssessment(patient, notes);
             }
             catch (HttpRequestException ex)
             {
                 Log.Error("Api can't be reached : {message}", ex.Message);
-                return assessment;
+                return null;
             }
         }
 
-        private static RiskLevel SetAssessment(int triggerTerm, Assessment assessment)
+        private static async Task<string> GetApiContent(HttpClient client, string baseAddress, string endpoint, int patientId)
         {
-            switch (triggerTerm)
+            string apiContent = null;
+            client.BaseAddress = new Uri(baseAddress);
+            var apiResponse = await client.GetAsync(endpoint + patientId);
+            if (apiResponse.IsSuccessStatusCode)
             {
-                case 2 when assessment.Age >= 30:
-                    return RiskLevel.Borderline;
-                case 3 when assessment.Gender == Gender.Male && assessment.Age <= 30:
-                case 4 when assessment.Gender == Gender.Female && assessment.Age <= 30:
-                    return RiskLevel.InDanger;
-                case 5 when assessment.Gender == Gender.Male && assessment.Age <= 30:
-                    return RiskLevel.EarlyOnset;
-                case 6 when assessment.Age >= 30:
-                    return RiskLevel.InDanger;
-                case 7 when assessment.Gender == Gender.Female && assessment.Age <= 30:
-                case <= 8 when assessment.Age >= 30:
-                    return RiskLevel.EarlyOnset;
-                default:
-                    return RiskLevel.None;
+                apiContent = await apiResponse.Content.ReadAsStringAsync();
             }
+            return apiContent;
         }
 
-        private static int CountAssessmentTerm(IReadOnlyCollection<NoteModel> notes)
+        private static Assessment CreateAssessment(PatientModel patient, IReadOnlyCollection<NoteModel> notes)
         {
-            string[] triggerTerms =
-            {
-                "Hemoglobin A1C","Microalbumin","Body Height","Body Weight","Smoker","Abnormal","Cholesterol","Dizziness","Relapse","Reaction","Antibodies"
-            };
-            var triggerCount = 0;
-            foreach (string term in triggerTerms)
-            {
-                var rx = new Regex($"{term}?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                foreach (var note in notes)
-                {
-                    var match = rx.Match(note.Message);
-                    while (match.Success)
-                    {
-                        triggerCount++;
-                        Log.Information($"Note.Id = {note.Id} : {match.Value} at index {match.Index} / TriggerCount : {triggerCount}");
-                        match = match.NextMatch();
-                    }
-                }
-            }
-            return triggerCount;
+            Assessment assessment = new();
+            assessment = MapPatient(assessment, patient);
+            int totalTriggerCount = CountAssessmentTerm(notes);
+            assessment.RiskLevel = SetRiskLevel(totalTriggerCount, assessment);
+            return assessment;
         }
 
         private static Assessment MapPatient(Assessment assessment, PatientModel patient)
@@ -103,6 +75,40 @@ namespace PatientAssessment.Infrastructure.Services
             assessment.Age = GetAge(patient.DateOfBirth);
             assessment.Gender = patient.Gender;
             return assessment;
+        }
+        private static int CountAssessmentTerm(IReadOnlyCollection<NoteModel> notes)
+        {
+            var triggerTerms = Configuration.GetSection("AssessmentService:TriggerTerms").GetChildren();
+            var triggerCount = 0;
+            foreach (var term in triggerTerms)
+            {
+                var rx = new Regex($"{term.Value}?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                foreach (var note in notes)
+                {
+                    var match = rx.Match(note.Message);
+                    while (match.Success)
+                    {
+                        triggerCount++;
+                        Log.Debug($"Note.Id = {note.Id} : {match.Value} at index {match.Index} / TriggerCount : {triggerCount}");
+                        match = match.NextMatch();
+                    }
+                }
+            }
+            return triggerCount;
+        }
+        private static RiskLevel SetRiskLevel(int totalTriggerCount, Assessment assessment)
+        {
+            return totalTriggerCount switch
+            {
+                2 when assessment.Age >= 30 => RiskLevel.Borderline,
+                3 when assessment.Gender == Gender.Male && assessment.Age <= 30 => RiskLevel.InDanger,
+                4 when assessment.Gender == Gender.Female && assessment.Age <= 30 => RiskLevel.InDanger,
+                5 when assessment.Gender == Gender.Male && assessment.Age <= 30 => RiskLevel.EarlyOnset,
+                6 when assessment.Age >= 30 => RiskLevel.InDanger,
+                7 when assessment.Gender == Gender.Female && assessment.Age <= 30 => RiskLevel.EarlyOnset,
+                <= 8 when assessment.Age >= 30 => RiskLevel.EarlyOnset,
+                _ => RiskLevel.None
+            };
         }
 
         private static int GetAge(DateTime dateOfBirth)
