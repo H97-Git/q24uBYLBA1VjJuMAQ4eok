@@ -1,5 +1,7 @@
 ﻿using BlazorPatient.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -17,30 +19,35 @@ namespace BlazorPatient.Infrastructure.Services
         public string ErrorMessage { get; set; }
 
         private readonly HttpClient _client;
+        private readonly IHttpClientFactory _clientFactory;
         private record Command(PatientModel PatientDto);
-        public PatientService(IHttpClientFactory httpClientFactory,IConfiguration configuration)
+        public PatientService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHostEnvironment env)
         {
+            _clientFactory = httpClientFactory;
             Configuration = configuration;
+            string baseAddress = env.IsDevelopment() ? Configuration["BlazorPatient:PatientService:BaseAddressW"] : Configuration["BlazorPatient:PatientService:BaseAddressL"];
             _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri(Configuration["BlazorPatient:PatientService:BaseAddress"]);
+            //_client.BaseAddress = new Uri(baseAddress);
         }
         public async Task<List<PatientModel>> Get()
         {
-            try
-            {
-                var apiResponse = await _client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
-                if (!apiResponse.IsSuccessStatusCode)
-                    return new List<PatientModel>();
+            await TestBaseAddress();
+            //try
+            //{
+            //    var apiResponse = await _client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
+            //    if (!apiResponse.IsSuccessStatusCode)
+            //        return new List<PatientModel>();
 
-                string content = await apiResponse.Content.ReadAsStringAsync();
-                var patients = JsonSerializer.Deserialize<List<PatientModel>>(content);
-                return patients;
-            }
-            catch (HttpRequestException exception)
-            {
-                HandleHttpRequestException(exception);
-                return new List<PatientModel>();
-            }
+            //    string content = await apiResponse.Content.ReadAsStringAsync();
+            //    var patients = JsonSerializer.Deserialize<List<PatientModel>>(content);
+            //    return patients;
+            //}
+            //catch (HttpRequestException exception)
+            //{
+            //    HandleHttpRequestException(exception);
+            //    return new List<PatientModel>();
+            //}
+            return new List<PatientModel>();
         }
 
         public async Task<int> Save(PatientModel patientDto)
@@ -76,6 +83,31 @@ namespace BlazorPatient.Infrastructure.Services
         {
             ErrorMessage = "Api can't be reached.";
             Log.Error("Api can't be reached : {message}", ex.Message);
+        }
+
+        private async Task TestBaseAddress()
+        {
+            var index = 0;
+            var baseAddressStrings = new[] { "http://0.0.0.0:5000", "http://127.0.0.1:5000", "http://localhost:5000", "http://patientdemographics-api:5000" };
+            foreach (string addressString in baseAddressStrings)
+            {
+                try
+                {
+                    Log.Debug($"Index : {index}");
+                    index++;
+                    Log.Debug(addressString);
+                    var client = _clientFactory.CreateClient();
+                    client.BaseAddress = new Uri(addressString);
+                    var apiResponse = await client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
+                    string content = await apiResponse.Content.ReadAsStringAsync();
+                    Log.Debug("content :");
+                    Log.Debug(content);
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug($"Message : {ex.Message}");
+                }
+            }
         }
     }
 }

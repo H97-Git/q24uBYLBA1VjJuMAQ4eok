@@ -8,7 +8,7 @@ namespace PatientHistory.Data
     {
         public static void Initialize(NoteContext context)
         {
-            Log.Information("DbInitializer : Initialize()");
+            Log.Debug("DbInitializer : Initialize()");
 
             var list = context.Notes.Find(x => true).ToList();
             if (list.Count is not 0)
@@ -194,7 +194,7 @@ namespace PatientHistory.Data
                     Message = "Patient states that they are not experiencing any problems\nLab reports Microalbumin elevated"
                 },
             };
-            Log.Information("DbInitializer : Seeding Db ...");
+            Log.Debug("DbInitializer : Seeding Db ...");
             context.Notes.InsertMany(notes);
         }
     }

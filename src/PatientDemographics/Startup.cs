@@ -29,8 +29,7 @@ namespace PatientDemographics
         {
             Log.Debug("Startup : ConfigureServices()");
 
-            services.AddControllers()
-                .AddNewtonsoftJson(options => options.UseMemberCasing());
+            services.AddControllers();
 
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
@@ -43,20 +42,11 @@ namespace PatientDemographics
             services.AddCustomSwagger();
             services.AddMediatR(typeof(Startup).Assembly);
             services.AddCors();
-
-            //In production (Docker)
-            if (_env.IsProduction())
-            {
-                //    services.AddHttpsRedirection(options =>
-                //    {
-                //        options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                //        options.HttpsPort = 5001;
-                //    });
-            }
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            Log.Debug("Patient.");
             Log.Debug("Startup : Configure()");
             Log.Debug($"EnvironmentName : {_env.EnvironmentName}");
             app.UseSerilogRequestLogging();
@@ -74,17 +64,7 @@ namespace PatientDemographics
             {
                 app.UseHttpsRedirection();
             }
-            //else
-            //{
-            //    //In production(Docker)
-            //    app.Use(async (context, next) =>
-            //    {
-            //        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
-            //        context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
-            //        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-            //        await next.Invoke();
-            //    });
-            //}
+
             app.UseCors();
             app.UseRouting();
             app.UseAuthorization();

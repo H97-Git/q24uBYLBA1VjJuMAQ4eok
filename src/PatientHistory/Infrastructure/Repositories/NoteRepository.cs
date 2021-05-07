@@ -28,7 +28,7 @@ namespace PatientHistory.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                Log.Information(ex.Message);
+                Log.Error(ex.Message);
                 throw;
             }
 

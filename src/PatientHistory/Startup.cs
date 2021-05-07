@@ -29,8 +29,7 @@ namespace PatientHistory
         public void ConfigureServices(IServiceCollection services)
         {
             Log.Debug("Startup : ConfigureServices()");
-            services.AddControllers()
-                .AddNewtonsoftJson(options => options.UseMemberCasing());
+            services.AddControllers();
 
             services.AddHttpClient();
             services.AddTransient<INoteRepository, NoteRepository>();
@@ -40,11 +39,14 @@ namespace PatientHistory
             string connectionString = _env.IsDevelopment()
                 ? Configuration["NoteDbSettings:ConnectionStringW"]
                 : Configuration["NoteDbSettings:ConnectionStringL"];
+
             services.AddSingleton<IMongoClient>(serviceProvider =>
                 new MongoClient(connectionString));
+
             services.AddScoped(serviceProvider =>
                 new NoteContext(serviceProvider.GetRequiredService<IMongoClient>(),
                 Configuration["NoteDbSettings:DatabaseName"]));
+
             services.AddCors();
             services.AddCustomSwagger();
             services.AddMediatR(typeof(Startup).Assembly);
@@ -52,7 +54,9 @@ namespace PatientHistory
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Log.Debug("Notes.");
             Log.Debug("Startup : Configure()");
+            Log.Debug($"EnvironmentName : {env.EnvironmentName}");
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
@@ -67,18 +71,9 @@ namespace PatientHistory
 
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
             }
-            //else
-            //{
-            //    app.Use(async (context, next) =>
-            //    {
-            //        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
-            //        context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
-            //        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-            //        await next.Invoke();
-            //    });
-            //}
+
             app.UseCors();
             app.UseRouting();
             app.UseAuthorization();

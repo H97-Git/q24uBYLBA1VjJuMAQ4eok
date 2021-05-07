@@ -1,3 +1,5 @@
+using System;
+using System.Net.Http;
 using Blazored.LocalStorage;
 using BlazorPatient.Infrastructure.Services;
 using BlazorPatient.Internal;
@@ -31,17 +33,13 @@ namespace BlazorPatient
             services.AddScoped<INoteService, NoteService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
             services.AddBlazoredLocalStorage();
-
-            //services.AddHttpsRedirection(options =>
-            //{
-            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-            //    options.HttpsPort = 5005;
-            //});
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Log.Debug("Blazor.");
             Log.Debug("Startup : Configure() ...");
+            Log.Debug($"EnvironmentName : {env.EnvironmentName}");
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
@@ -54,18 +52,6 @@ namespace BlazorPatient
             {
                 app.UseDeveloperExceptionPage();
                 app.UseHttpsRedirection();
-            }
-            else
-            {
-                //app.UseExceptionHandler("/Error");
-                //app.UseHsts();
-                //app.Use(async (context, next) =>
-                //{
-                //    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
-                //    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
-                //    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                //    await next.Invoke();
-                //});
             }
 
             app.UseStaticFiles();

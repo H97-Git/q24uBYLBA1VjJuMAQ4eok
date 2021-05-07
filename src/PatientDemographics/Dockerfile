@@ -6,10 +6,6 @@ EXPOSE 80
 EXPOSE 443
 
 ENV ASPNETCORE_ENVIRONMENT=Production
-#ENV ASPNETCORE_Kestrel__Certificates__Default__Password=P@ssword123
-#ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-#ENV ASPNETCORE_HTTPS_PORT=5001
-#ENV ASPNETCORE_URLS=https://+;http://+
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
