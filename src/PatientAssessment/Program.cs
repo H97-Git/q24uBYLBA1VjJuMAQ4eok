@@ -21,7 +21,7 @@ namespace PatientAssessment
                 .CreateLogger();
             try
             {
-                Log.Information("Main : Building+Running web host...");
+                Log.Debug("Main : Building+Running web host...");
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }

@@ -22,7 +22,7 @@ namespace BlazorPatient
 
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Information("Startup : ConfigureServices() ...");
+            Log.Debug("Startup : ConfigureServices() ...");
 
             services.AddCustomBlazorService();
 
@@ -41,12 +41,13 @@ namespace BlazorPatient
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Information("Startup : ConfigureServices() ...");
+            Log.Debug("Startup : Configure() ...");
+            app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
             foreach (string item in urls)
             {
-                Log.Information("URl : {0}", item);
+                Log.Debug("URl : {0}", item);
             }
 
             if (env.IsDevelopment())
@@ -56,16 +57,15 @@ namespace BlazorPatient
             }
             else
             {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-                app.Use(async (context, next) =>
-                {
-                    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
-                    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
-                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                    await next.Invoke();
-                });
+                //app.UseExceptionHandler("/Error");
+                //app.UseHsts();
+                //app.Use(async (context, next) =>
+                //{
+                //    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block ");
+                //    context.Response.Headers.Add("Content-Security-Policy", "default-src 'self';");
+                //    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                //    await next.Invoke();
+                //});
             }
 
             app.UseStaticFiles();

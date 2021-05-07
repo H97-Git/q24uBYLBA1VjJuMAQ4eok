@@ -2,27 +2,28 @@ version: '3.4'
 
 services:
 
-  #blazorpatient:
-  #  image: ${DOCKER_REGISTRY-}blazorpatient
-  #  build:
-  #    context: .
-  #    dockerfile: src/BlazorPatient/Dockerfile
-  #  ports:
-  #   - "5004:80"
-  #   - "5005:443"
-  #  depends_on:
-  #   - patientdemographics-api
+  blazorpatient:
+    image: ${DOCKER_REGISTRY-}blazorpatient
+    build:
+      context: .
+      dockerfile: src/BlazorPatient/Dockerfile
+    ports:
+     - "6000:80"
+     - "6001:443"
+    depends_on:
+     - patientdemographics-api
+     - patienthistory-api
 
-  #patientdemographics-api:
-  #  image: ${DOCKER_REGISTRY-}patientdemographics
-  #  build:
-  #    context: .
-  #    dockerfile: src/PatientDemographics/Dockerfile
-  #  ports:
-  #   - "5000:80"
-  #   - "5001:443"
-  #  depends_on:
-  #   - sqldata
+  patientdemographics-api:
+    image: ${DOCKER_REGISTRY-}patientdemographics
+    build:
+      context: .
+      dockerfile: src/PatientDemographics/Dockerfile
+    ports:
+     - "5000:80"
+     - "5001:443"
+    depends_on:
+     - sqldata
 
   patienthistory-api:
     image: ${DOCKER_REGISTRY-}patienthistory
@@ -37,7 +38,6 @@ services:
     networks:
       - local
 
-
   mongo:
     container_name: mongo
     image: mongo
@@ -47,13 +47,13 @@ services:
     networks:
       - local
 
-  #sqldata:
-  #  image: mcr.microsoft.com/mssql/server:latest
-  #  environment:
-  #     - SA_PASSWORD=Passw@rd123!
-  #     - ACCEPT_EULA=Y
-  #  ports:
-  #      - "5433:1433"
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+       - SA_PASSWORD=Passw@rd123!
+       - ACCEPT_EULA=Y
+    ports:
+        - "5433:1433"
 
 networks:
   local:

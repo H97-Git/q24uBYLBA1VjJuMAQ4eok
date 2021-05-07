@@ -34,11 +34,14 @@ namespace PatientAssessment
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Information("Startup : Configure()");
+            Log.Debug("Startup : Configure()");
             app.UseSerilogRequestLogging();
 
             var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
-            Log.Information("URl : {0}", urls.FirstOrDefault(x => x.Contains("https")));
+            foreach (string item in urls)
+            {
+                Log.Debug("URl : {0}", item);
+            }
 
             app.UseCustomExceptionHandler();
 

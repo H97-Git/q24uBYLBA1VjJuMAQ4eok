@@ -20,6 +20,11 @@ namespace PatientDemographics.Internal
                     string exType = ex.GetType().Name;
                     switch (exType)
                     {
+                        case "ArgumentNullException":
+                            await context.Response
+                                .WriteAsJsonAsync(new { Error = "Argument was null.", Arg = ex.Message });
+                            Log.Error(ex, "Resources not found.");
+                            return;
                         case "KeyNotFoundException":
                             await context.Response
                                 .WriteAsJsonAsync(new { Error = "Resources not found in the system.", Id = ex.Message });
@@ -29,7 +34,7 @@ namespace PatientDemographics.Internal
                             var validationException = (ValidationException)ex;
                             Log.Error(ex.Message, "Validation Exception");
                             await context.Response
-                                .WriteAsJsonAsync(new {validationException.Errors });
+                                .WriteAsJsonAsync(new { Error = "Validation Exception", validationException.Errors });
                             return;
                         default:
                             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

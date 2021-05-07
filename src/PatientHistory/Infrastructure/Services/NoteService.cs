@@ -1,4 +1,5 @@
-﻿using PatientHistory.Data;
+﻿using System;
+using PatientHistory.Data;
 using PatientHistory.Data.DTO;
 using PatientHistory.Infrastructure.Repositories;
 using System.Collections.Generic;
@@ -52,6 +53,11 @@ namespace PatientHistory.Infrastructure.Services
 
         public async Task<string> Create(NoteDto noteDto)
         {
+            if (noteDto == null)
+            {
+                throw new ArgumentNullException(nameof(NoteDto));
+            }
+
             var validationResult = await _noteValidator.ValidateAsync(noteDto);
 
             if (!validationResult.IsValid)
@@ -71,6 +77,11 @@ namespace PatientHistory.Infrastructure.Services
 
         public void Update(string id, NoteDto noteDto)
         {
+            if (noteDto == null)
+            {
+                throw new ArgumentNullException(nameof(NoteDto));
+            }
+
             var note = noteDto.Adapt<Note>();
             _noteRepository.Update(id, note);
         }

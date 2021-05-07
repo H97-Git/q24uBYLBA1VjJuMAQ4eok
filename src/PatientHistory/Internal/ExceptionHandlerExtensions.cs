@@ -20,6 +20,11 @@ namespace PatientHistory.Internal
                     string exType = ex.GetType().Name;
                     switch (exType)
                     {
+                        case "ArgumentNullException":
+                            await context.Response
+                                .WriteAsJsonAsync(new { Error = "Argument was null.", Arg = ex.Message });
+                            Log.Error(ex, "Resources not found.");
+                            return;
                         case "MongoWriteException":
                             await context.Response
                                 .WriteAsJsonAsync(new { Error = "Mongo Exception", ex.Message });

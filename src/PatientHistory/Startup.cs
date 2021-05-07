@@ -16,8 +16,11 @@ namespace PatientHistory
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
+            _env = env;
             Configuration = configuration;
         }
 
@@ -34,8 +37,11 @@ namespace PatientHistory
             services.AddTransient<INoteService, NoteService>();
             services.AddSingleton<IPatientService, PatientService>();
 
+            string connectionString = _env.IsDevelopment()
+                ? Configuration["NoteDbSettings:ConnectionStringW"]
+                : Configuration["NoteDbSettings:ConnectionStringL"];
             services.AddSingleton<IMongoClient>(serviceProvider =>
-                new MongoClient(Configuration["NoteDbSettings:ConnectionString"]));
+                new MongoClient(connectionString));
             services.AddScoped(serviceProvider =>
                 new NoteContext(serviceProvider.GetRequiredService<IMongoClient>(),
                 Configuration["NoteDbSettings:DatabaseName"]));
@@ -54,10 +60,11 @@ namespace PatientHistory
             {
                 Log.Debug("URl : {0}", item);
             }
-            app.UseCustomExceptionHandler();
 
+            app.UseCustomExceptionHandler();
             app.UseHttpsRedirection();
-                app.UseCustomSwagger();
+            app.UseCustomSwagger();
+
             if (env.IsDevelopment())
             {
                 //app.UseDeveloperExceptionPage();
