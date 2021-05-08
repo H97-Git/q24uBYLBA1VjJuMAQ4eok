@@ -28,7 +28,7 @@ namespace PatientAssessment.Infrastructure.Services
             try
             {
                 string patientApiContent =
-                    await GetApiContent(patientClient, Configuration["AssessmentService:PatientBaseAddress"], Configuration["AssessmentService:Endpoint:Patient"], patientId);
+                    await GetApiContent(patientClient,Configuration["AssessmentService:PatientBaseAddress"],Configuration["AssessmentService:Endpoint:Patient"],patientId);
                 if (patientApiContent is null) return null;
 
                 string noteApiContent =

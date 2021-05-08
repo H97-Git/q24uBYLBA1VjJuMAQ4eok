@@ -1,5 +1,4 @@
 ﻿using BlazorPatient.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -20,34 +19,45 @@ namespace BlazorPatient.Infrastructure.Services
 
         private readonly HttpClient _client;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly IHostEnvironment _env;
         private record Command(PatientModel PatientDto);
         public PatientService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHostEnvironment env)
         {
+            _env = env;
             _clientFactory = httpClientFactory;
             Configuration = configuration;
-            string baseAddress = env.IsDevelopment() ? Configuration["BlazorPatient:PatientService:BaseAddressW"] : Configuration["BlazorPatient:PatientService:BaseAddressL"];
+            string baseAddress = _env.IsDevelopment() ? Configuration["BlazorPatient:PatientService:BaseAddressW"] : Configuration["BlazorPatient:PatientService:BaseAddressL"];
             _client = httpClientFactory.CreateClient();
             //_client.BaseAddress = new Uri(baseAddress);
         }
         public async Task<List<PatientModel>> Get()
         {
-            await TestBaseAddress();
-            //try
-            //{
-            //    var apiResponse = await _client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
-            //    if (!apiResponse.IsSuccessStatusCode)
-            //        return new List<PatientModel>();
+            if (_env.IsProduction())
+            {
+                await TestBaseAddress();
+                
+                return new List<PatientModel>();
+            }
 
-            //    string content = await apiResponse.Content.ReadAsStringAsync();
-            //    var patients = JsonSerializer.Deserialize<List<PatientModel>>(content);
-            //    return patients;
-            //}
-            //catch (HttpRequestException exception)
-            //{
-            //    HandleHttpRequestException(exception);
-            //    return new List<PatientModel>();
-            //}
-            return new List<PatientModel>();
+            try
+            {
+                var apiResponse =
+                    await _client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
+                if (!apiResponse.IsSuccessStatusCode)
+                    return new List<PatientModel>();
+
+                string content = await apiResponse.Content.ReadAsStringAsync();
+                var patients = JsonSerializer.Deserialize<List<PatientModel>>(content);
+                
+                return patients;
+            }
+            catch (HttpRequestException exception)
+            {
+                HandleHttpRequestException(exception);
+                
+                return new List<PatientModel>();
+            }
+
         }
 
         public async Task<int> Save(PatientModel patientDto)
