@@ -54,55 +54,7 @@ namespace PatientDemographics.Tests.Infrastructure.Services
             patientDto.FamilyName.Should().Be("Blazor");
             patientDto.GivenName.Should().Be("MediatR");
         }
-
-        [Fact]
-        public async Task SavePatient_ShouldCallRepo()
-        {
-            // Arrange
-            var counter = 0;
-            var patientDto = new PatientDto
-            {
-                Id = 99,
-                FamilyName = "Blazor",
-                GivenName = "MediatR",
-                Gender = Gender.Female,
-                DateOfBirth = DateTime.Now.Subtract(new TimeSpan(24, 0, 0))
-            };
-            _patientRepository.When(p => p.SavePatient(Arg.Any<Patient>())).Do(x => counter++);
-
-            // Act
-            await _sut.SavePatient(patientDto);
-
-            // Assert
-            await _patientRepository.Received().SavePatient(Arg.Any<Patient>());
-            counter.Should().Be(1);
-        }
-
-        [Fact]
-        public async Task UpdatePatient_ShouldCallRepo_WhenExist()
-        {
-            // Arrange
-            var counter = 0;
-            var patient = new Patient { Id = 99 };
-            _patientRepository.When(x => x.UpdatePatient(patient)).Do(x => counter++);
-            _patientRepository.GetPatient(patient.Id).Returns(patient);
-
-            // Act
-            var patientDto = new PatientDto
-            {
-                Id = 99,
-                FamilyName = "Blazor",
-                GivenName = "MediatR",
-                Gender = Gender.Female,
-                DateOfBirth = DateTime.Now.Subtract(new TimeSpan(24, 0, 0))
-            };
-            await _sut.UpdatePatient(patientDto);
-
-            // Assert
-            await _patientRepository.Received().UpdatePatient(patient);
-            counter.Should().Be(1);
-        }
-
+        
         [Fact]
         public void GetPatientId_ShouldThrowKeyNotFoundException_WhenDoesNotExist()
         {
@@ -118,6 +70,29 @@ namespace PatientDemographics.Tests.Infrastructure.Services
                 .WithMessage($"{id}");
         }
 
+        [Fact]
+        public async Task SavePatient_ShouldCallRepo()
+        {
+            // Arrange
+            var counter = 0;
+            var patientDto = new PatientDto
+            {
+                Id = 99,
+                FamilyName = "Blazor",
+                GivenName = "MediatR",
+                Gender = Gender.Male,
+                DateOfBirth = DateTime.Now.Subtract(new TimeSpan(24, 0, 0))
+            };
+            _patientRepository.When(p => p.SavePatient(Arg.Any<Patient>())).Do(x => counter++);
+
+            // Act
+            await _sut.SavePatient(patientDto);
+
+            // Assert
+            await _patientRepository.Received().SavePatient(Arg.Any<Patient>());
+            counter.Should().Be(1);
+        }
+        
         [Fact]
         public void SavePatient_ShouldThrowValidationException_WhenPatientIsNotValid()
         {
@@ -138,6 +113,56 @@ namespace PatientDemographics.Tests.Infrastructure.Services
         }
 
         [Fact]
+        public void SavePatient_ShouldThrowArgumentNullException_WhenPatientIsNull()
+        {
+            // Arrange
+
+            // Act
+            Func<Task> act = async () => await _sut.SavePatient(null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public async Task UpdatePatient_ShouldCallRepo_WhenExist()
+        {
+            // Arrange
+            var counter = 0;
+            var patient = new Patient { Id = 99};
+            _patientRepository.GetPatient(patient.Id).Returns(patient);
+            _patientRepository.When(x => x.UpdatePatient(patient)).Do(x => counter++);
+
+            // Act
+            var patientDto = new PatientDto
+            {
+                Id = 99,
+                FamilyName = "FamilyName",
+                GivenName = "GivenName",
+                Gender = Gender.Female,
+                DateOfBirth = DateTime.Now.Subtract(new TimeSpan(24, 0, 0))
+            };
+             await _sut.UpdatePatient(99, patientDto);
+
+            // Assert
+            await _patientRepository.Received().UpdatePatient(patient);
+            counter.Should().Be(1);
+        }
+
+        [Fact]
+        public void UpdatePatient_ShouldThrowArgumentNullException_WhenPatientIsNull()
+        {
+            // Arrange
+            
+            // Act
+            Func<Task> act = async () => await _sut.UpdatePatient(new Random().Next(), null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>()
+                .WithMessage($"Value cannot be null. (Parameter '{nameof(PatientDto)}')" );
+        }
+
+        [Fact]
         public void UpdatePatient_ShouldThrowKeyNotFoundException_WhenDoesNotExist()
         {
             // Arrange
@@ -151,7 +176,7 @@ namespace PatientDemographics.Tests.Infrastructure.Services
             };
 
             // Act
-            Func<Task> act = async () => await _sut.UpdatePatient(patientDto);
+            Func<Task> act = async () => await _sut.UpdatePatient(new Random().Next(), patientDto);
 
             // Assert
             act.Should().Throw<KeyNotFoundException>()
@@ -171,7 +196,7 @@ namespace PatientDemographics.Tests.Infrastructure.Services
             };
 
             // Act
-            Func<Task> act = async () => await _sut.UpdatePatient(patientDto);
+            Func<Task> act = async () => await _sut.UpdatePatient(new Random().Next(),patientDto);
 
             // Assert
             act.Should().Throw<ValidationException>();

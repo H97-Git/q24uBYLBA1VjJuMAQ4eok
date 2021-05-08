@@ -48,13 +48,14 @@ namespace PatientHistory.Tests.Infrastructure.Repositories
         public void CreateNote_ShouldReturnNote()
         {
             // Arrange
-            _sut.Create(Arg.Any<Note>()).Returns(new Note { Id = "Unit Test" });
+            var noteToCreate = new Note() {Id = "Unit Test"};
+            _sut.Create(Arg.Any<Note>()).Returns(noteToCreate.Id);
 
             // Act
-            var notes = _sut.Create(new Note());
+            var note = _sut.Create(noteToCreate);
 
             // Assert
-            notes.Id.Should().Be("Unit Test");
+            note.Should().Be("Unit Test");
         }
 
         [Fact]

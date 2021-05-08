@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using PatientDemographics.Data;
 using PatientDemographics.Infrastructure.Repositories;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace PatientDemographics.Tests.Infrastructure.Repositories
             var patients = await sut.GetPatient();
 
             // Assert
-            patients.Should().HaveCount(6);
+            patients.Should().BeOfType<List<Patient>>();
         }
         [Fact]
         public async Task GetPatient_ShouldReturnPatient_WhenDoesExist()

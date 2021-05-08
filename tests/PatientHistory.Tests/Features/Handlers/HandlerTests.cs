@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -17,12 +18,13 @@ namespace PatientHistory.Tests.Features.Handlers
         private readonly NoteDto _note;
         public HandlerTests()
         {
-            _note = new NoteDto() { Id = "99" };
+            _note = new NoteDto() { Id = "99",PatientId = 99};
             var list = new List<NoteDto> { _note };
 
             _noteService = Substitute.For<INoteService>();
             _noteService.Get().Returns(list);
             _noteService.Get(Arg.Any<string>()).Returns(_note);
+            _noteService.GetByPatientId(Arg.Any<int>()).Returns(list);
         }
 
         [Fact]
@@ -40,7 +42,7 @@ namespace PatientHistory.Tests.Features.Handlers
         }
 
         [Fact]
-        public async Task GetPatientById()
+        public async Task GetById()
         {
             // Arrange
             var query = new GetNoteById.Query("99");
@@ -51,6 +53,20 @@ namespace PatientHistory.Tests.Features.Handlers
 
             // Assert
             response.NoteDto.Id.Should().Be("99");
+        }
+
+        [Fact]
+        public async Task GetPatientById()
+        {
+            // Arrange
+            var query = new GetNoteByPatientId.Query(99);
+            var sut = new GetNoteByPatientId.Handler(_noteService);
+
+            // Act
+            var response = await sut.Handle(query, new CancellationToken());
+
+            // Assert
+            response.NotesDto.Should().OnlyContain(x => x.PatientId == 99);
         }
 
         [Fact]

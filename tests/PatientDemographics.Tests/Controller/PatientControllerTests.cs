@@ -101,8 +101,7 @@ namespace PatientDemographics.Tests.Controller
             _mediator.Send(Arg.Any<PutPatient.Command>()).Returns(patientDto);
 
             // Act
-            var command = new PutPatient.Command(patientDto);
-            var actionResult = await _sut.PutAsync(command);
+            var actionResult = await _sut.PutAsync(new Random().Next(),patientDto);
 
             // Assert
             if (actionResult.Result is OkObjectResult result)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -71,7 +72,7 @@ namespace PatientDemographics.Tests.Features.Handlers
         public async Task PutPatient()
         {
             // Arrange
-            var command = new PutPatient.Command(_patient);
+            var command = new PutPatient.Command(new Random().Next(),_patient);
             var sut = new PutPatient.Handler(_patientService);
 
             // Act

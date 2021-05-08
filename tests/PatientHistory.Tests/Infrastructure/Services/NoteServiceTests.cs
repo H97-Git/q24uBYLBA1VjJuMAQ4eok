@@ -56,14 +56,28 @@ namespace PatientHistory.Tests.Infrastructure.Services
         }
 
         [Fact]
+        public void GetNotesByPatientId_ShouldReturnList()
+        {
+            // Arrange
+            _noteRepository.Get().Returns(new List<Note>());
+
+            // Act
+            var notes = _sut.GetByPatientId(Arg.Any<int>());
+
+            // Assert
+            notes.Should().BeOfType<List<NoteDto>>();
+        }
+
+        [Fact]
         public void CreateNote_ShouldReturnNote()
         {
             // Arrange
             int counter = 0;
+            var noteDto = new NoteDto {Id = "randomString", Message = "Unit Test is cool!"};
             _noteRepository.When(x => x.Create(Arg.Any<Note>())).Do(x => counter++);
             _patientService.Get(Arg.Any<int>()).Returns(true);
             // Act
-            _sut.Create(new Note());
+            _sut.Create(noteDto);
 
             // Assert
             _noteRepository.Received().Create(Arg.Any<Note>());
@@ -78,7 +92,7 @@ namespace PatientHistory.Tests.Infrastructure.Services
             _noteRepository.When(x => x.Update("",Arg.Any<Note>())).Do(x => counter++);
 
             // Act
-            _sut.Update("",new Note());
+            _sut.Update("",new NoteDto());
 
             // Assert
             _noteRepository.Received().Update("",Arg.Any<Note>());
@@ -90,13 +104,15 @@ namespace PatientHistory.Tests.Infrastructure.Services
         {
             // Arrange
             int counter = 0;
+            const string received = "Unit Test is cool!";
+            _noteRepository.Get(Arg.Any<string>()).Returns(new Note());
             _noteRepository.When(x => x.Remove(Arg.Any<string>())).Do(x => counter++);
-
+            
             // Act
-            _sut.Remove("");
+            _sut.Remove(received);
 
             // Assert
-            _noteRepository.Received().Remove("");
+            _noteRepository.Received().Remove(received);
             counter.Should().Be(1);
         }
 
@@ -115,26 +131,12 @@ namespace PatientHistory.Tests.Infrastructure.Services
         }
 
         [Fact]
-        public void GetNotesPatientId_ShouldThrowKeyNotFoundException_WhenDoesNotExist()
-        {
-            // Arrange
-            _noteRepository.Get(Arg.Any<string>()).ReturnsNull();
-            int r = new Random().Next();
-            // Act
-            Func<List<NoteDto>> act = () => _sut.GetByPatientId(r);
-
-            // Assert
-            act.Should().Throw<KeyNotFoundException>()
-                .WithMessage($"{r}");
-        }
-
-        [Fact]
         public void CreateNotes_ShouldThrowKeyNotFoundException_WhenPatientDoesNotExist()
         {
             // Arrange
             _noteRepository.Get(Arg.Any<string>()).ReturnsNull();
             _patientService.Get(Arg.Any<int>()).Returns(false);
-            var note = new Note{PatientId = 99};
+            var note = new NoteDto{PatientId = 99,Message = "Unit Test is cool."};
 
             // Act
             Func<Task> act = async () => await _sut.Create(note);
@@ -142,6 +144,30 @@ namespace PatientHistory.Tests.Infrastructure.Services
             // Assert
             act.Should().Throw<KeyNotFoundException>()
                 .WithMessage($"{note.PatientId}");
+        }
+
+        [Fact]
+        public void CreateNotes_ShouldThrowArgumentNullException_WhenNoteIsNull()
+        {
+            // Arrange
+
+            // Act
+            Func<Task> act = async () => await _sut.Create(null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void UpdateNotes_ShouldThrowArgumentNullException_WhenNoteIsNull()
+        {
+            // Arrange
+
+            // Act
+            Action act = () => _sut.Update("",null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
         }
     }
 }
