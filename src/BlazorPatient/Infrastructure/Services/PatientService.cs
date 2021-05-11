@@ -1,13 +1,13 @@
 ﻿using BlazorPatient.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BlazorPatient.Infrastructure.Services
@@ -28,16 +28,12 @@ namespace BlazorPatient.Infrastructure.Services
             Configuration = configuration;
             string baseAddress = _env.IsDevelopment() ? Configuration["BlazorPatient:PatientService:BaseAddressW"] : Configuration["BlazorPatient:PatientService:BaseAddressL"];
             _client = httpClientFactory.CreateClient();
-            //_client.BaseAddress = new Uri(baseAddress);
+            _client.BaseAddress = new Uri(baseAddress);
         }
         public async Task<List<PatientModel>> Get()
         {
-            if (_env.IsProduction())
-            {
-                await TestBaseAddress();
-                
-                return new List<PatientModel>();
-            }
+            //await TestBaseAddress();
+            //return new List<PatientModel>();
 
             try
             {
@@ -47,14 +43,14 @@ namespace BlazorPatient.Infrastructure.Services
                     return new List<PatientModel>();
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                var patients = JsonSerializer.Deserialize<List<PatientModel>>(content);
-                
+                var patients = JsonConvert.DeserializeObject<List<PatientModel>>(content);
+
                 return patients;
             }
             catch (HttpRequestException exception)
             {
                 HandleHttpRequestException(exception);
-                
+
                 return new List<PatientModel>();
             }
 
@@ -63,10 +59,10 @@ namespace BlazorPatient.Infrastructure.Services
         public async Task<int> Save(PatientModel patientDto)
         {
             using var addContent =
-                new StringContent(JsonSerializer.Serialize(new Command(patientDto)), Encoding.UTF8)
+                new StringContent(JsonConvert.SerializeObject(new Command(patientDto)), Encoding.UTF8)
                 { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
             using var editContent =
-                new StringContent(JsonSerializer.Serialize(patientDto), Encoding.UTF8)
+                new StringContent(JsonConvert.SerializeObject(patientDto), Encoding.UTF8)
                 { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
 
             try
@@ -76,7 +72,7 @@ namespace BlazorPatient.Infrastructure.Services
                     : await _client.PutAsync(Configuration["BlazorPatient:PatientService:Endpoint:Put"] + patientDto.Id, editContent);
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                ErrorMessage = JsonSerializer.Deserialize<string>(content);
+                ErrorMessage = JsonConvert.DeserializeObject<string>(content);
 
                 return apiResponse.IsSuccessStatusCode ? patientDto.Id == 0 ? 1 : 2 : 0;
                 //IsSuccessStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2

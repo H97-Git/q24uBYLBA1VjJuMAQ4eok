@@ -3,8 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BlazorPatient.Infrastructure.Services
 {
@@ -28,7 +28,10 @@ namespace BlazorPatient.Infrastructure.Services
                     return new AssessmentModel();
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                var assessment = JsonSerializer.Deserialize<AssessmentModel>(content);
+                if (string.IsNullOrEmpty(content)) 
+                    return new AssessmentModel();
+
+                var assessment = JsonConvert.DeserializeObject<AssessmentModel>(content);
                 return assessment;
             }
             catch (HttpRequestException exception)

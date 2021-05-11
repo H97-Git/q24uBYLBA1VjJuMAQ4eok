@@ -25,7 +25,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{F3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PatientAssessment", "src\PatientAssessment\PatientAssessment.csproj", "{B5968C06-1589-408E-8E0D-9200499157F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientAssessment.Tests", "tests\PatientAssessment.Tests\PatientAssessment.Tests.csproj", "{91E5B8CE-86E5-42EC-874C-629D7EA06713}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PatientAssessment.Tests", "tests\PatientAssessment.Tests\PatientAssessment.Tests.csproj", "{91E5B8CE-86E5-42EC-874C-629D7EA06713}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{12EB3A83-1E70-4BA7-AC23-6883B7111B99}"
+	ProjectSection(SolutionItems) = preProject
+		EzDebug\WatchRunDebug.ps1 = EzDebug\WatchRunDebug.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

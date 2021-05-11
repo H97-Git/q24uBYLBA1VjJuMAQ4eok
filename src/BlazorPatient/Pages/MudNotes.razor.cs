@@ -15,7 +15,7 @@ namespace BlazorPatient.Pages
         private PatientModel _patient = new();
         private string _searchString = "";
         private string _cardHeaderString = "Add a note :";
-        private int _age = 0;
+        private int _age;
         private string _riskLevel;
         private string _riskLevelIcon;
         private Color _riskLevelColor;
@@ -31,7 +31,7 @@ namespace BlazorPatient.Pages
 
             _notes = await NoteService.GetByPatientId(PatientId);
             _patient = _patients.Find(x => x.Id == PatientId);
-            _age = GetAge();
+            if (_patient != null) _age = _patient.GetAge();
             var assessment = await AssessmentService.GetByPatientId(PatientId);
             _riskLevel = assessment.RiskLevel.ToString();
             switch (assessment.RiskLevel)
@@ -102,24 +102,6 @@ namespace BlazorPatient.Pages
         private static string GetPatientDate(DateTime? dateOfBirth)
         {
             return dateOfBirth != null ? dateOfBirth.Value.ToShortDateString() : "";
-        }
-
-        private int GetAge()
-        {
-            if (_patient.DateOfBirth == null)
-            {
-                return 0;
-            }
-
-            var today = DateTime.Today;
-            int age = today.Year - _patient.DateOfBirth.Value.Year;
-
-            // Go back to the year in which the person was born in case of a leap year
-            if (_patient.DateOfBirth.Value.Date > today.AddYears(-age))
-            {
-                age--;
-            }
-            return age;
         }
     }
 }

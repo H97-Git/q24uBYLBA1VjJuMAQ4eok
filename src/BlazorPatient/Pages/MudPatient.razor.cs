@@ -19,7 +19,7 @@ namespace BlazorPatient.Pages
         protected override async Task OnInitializedAsync()
         {
             _patients = await PatientService.Get();
-            if (PatientService.ErrorMessage != "")
+            if (PatientService.ErrorMessage is not null && PatientService.ErrorMessage != "")
             {
                 SnackBar.Add(PatientService.ErrorMessage, Severity.Error);
             }

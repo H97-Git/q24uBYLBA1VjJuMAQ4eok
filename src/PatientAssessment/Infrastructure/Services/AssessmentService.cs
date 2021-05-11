@@ -72,7 +72,7 @@ namespace PatientAssessment.Infrastructure.Services
         {
             assessment.FamilyName = patient.FamilyName;
             assessment.GivenName = patient.GivenName;
-            assessment.Age = GetAge(patient.DateOfBirth);
+            assessment.Age = patient.GetAge();
             assessment.Gender = patient.Gender;
             return assessment;
         }
@@ -109,19 +109,6 @@ namespace PatientAssessment.Infrastructure.Services
                 <= 8 when assessment.Age >= 30 => RiskLevel.EarlyOnset,
                 _ => RiskLevel.None
             };
-        }
-
-        private static int GetAge(DateTime dateOfBirth)
-        {
-            var today = DateTime.Today;
-            int age = today.Year - dateOfBirth.Year;
-
-            // Go back to the year in which the person was born in case of a leap year
-            if (dateOfBirth.Date > today.AddYears(-age))
-            {
-                age--;
-            }
-            return age;
         }
     }
 }

@@ -9,7 +9,7 @@ html, body {
     cursor: pointer;
 }
 .mainContent {
-    padding: 85px;
+    padding: 90px;
 }
 
 .alert {
@@ -28,8 +28,13 @@ a:hover {
     color: #27272f;
     font-weight: 900;
 }
+.py-8 {
+    padding-left: 10px;
+}
+.mud-grid-item-xs-6 {
+    margin: 10px;
+}
 /*#endregion*/
-
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }

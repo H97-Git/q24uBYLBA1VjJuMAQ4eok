@@ -341,3 +341,4 @@ healthchecksdb
 /.vscode/solution-explorer
 /.vscode
 /.dockerignore
+/EzDebug

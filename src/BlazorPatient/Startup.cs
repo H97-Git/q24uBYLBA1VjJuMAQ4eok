@@ -1,5 +1,3 @@
-using System;
-using System.Net.Http;
 using Blazored.LocalStorage;
 using BlazorPatient.Infrastructure.Services;
 using BlazorPatient.Internal;
@@ -37,7 +35,6 @@ namespace BlazorPatient
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Debug("Blazor.");
             Log.Debug("Startup : Configure() ...");
             Log.Debug($"EnvironmentName : {env.EnvironmentName}");
             app.UseSerilogRequestLogging();

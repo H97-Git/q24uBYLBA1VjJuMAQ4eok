@@ -1,13 +1,13 @@
 ﻿using BlazorPatient.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BlazorPatient.Infrastructure.Services
@@ -18,11 +18,11 @@ namespace BlazorPatient.Infrastructure.Services
         public string ErrorMessage { get; set; }
         private readonly HttpClient _client;
 
-        public NoteService(IHttpClientFactory httpClientFactory,IHostEnvironment env, IConfiguration configuration)
+        public NoteService(IHttpClientFactory httpClientFactory, IHostEnvironment env, IConfiguration configuration)
         {
             Configuration = configuration;
             _client = httpClientFactory.CreateClient();
-            _client.BaseAddress =  new Uri(Configuration["BlazorPatient:NoteService:BaseAddress"]);
+            _client.BaseAddress = new Uri(Configuration["BlazorPatient:NoteService:BaseAddress"]);
         }
 
         public async Task<List<NoteModel>> GetByPatientId(int patientId)
@@ -34,7 +34,7 @@ namespace BlazorPatient.Infrastructure.Services
                     return new List<NoteModel>();
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                var notes = JsonSerializer.Deserialize<List<NoteModel>>(content);
+                var notes = JsonConvert.DeserializeObject<List<NoteModel>>(content);
                 return notes;
             }
             catch (HttpRequestException exception)
@@ -46,7 +46,7 @@ namespace BlazorPatient.Infrastructure.Services
 
         public async Task<int> Save(NoteModel note)
         {
-            var addContent = new StringContent(JsonSerializer.Serialize(note), Encoding.UTF8);
+            var addContent = new StringContent(JsonConvert.SerializeObject(note), Encoding.UTF8);
             addContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             try
@@ -56,7 +56,7 @@ namespace BlazorPatient.Infrastructure.Services
                     : await _client.PutAsync(Configuration["BlazorPatient:NoteService:Endpoint:Put"] + note.Id, addContent);
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                ErrorMessage = JsonSerializer.Deserialize<string>(content);
+                ErrorMessage = JsonConvert.DeserializeObject<string>(content);
 
                 return apiResponse.IsSuccessStatusCode ? note.Id is null ? 1 : 2 : 0;
                 //IsSuccessStatusCode = true && NoteModel.Id is null ? - It's a Save return 1 : NoteModel.Id is not null - It's an Update return 2

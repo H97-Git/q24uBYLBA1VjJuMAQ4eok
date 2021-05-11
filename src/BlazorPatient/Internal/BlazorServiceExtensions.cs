@@ -7,7 +7,8 @@ namespace BlazorPatient.Internal
     {
         public static IServiceCollection AddCustomBlazorService(this IServiceCollection services)
         {
-            services.AddRazorPages();
+            services.AddRazorPages()
+                .AddNewtonsoftJson(options => options.UseMemberCasing());
             services.AddControllersWithViews();
             services.AddServerSideBlazor();
             services.AddMudServices();

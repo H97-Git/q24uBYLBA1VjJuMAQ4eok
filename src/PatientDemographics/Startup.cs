@@ -29,7 +29,8 @@ namespace PatientDemographics
         {
             Log.Debug("Startup : ConfigureServices()");
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options => options.UseMemberCasing());;
 
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
@@ -46,7 +47,6 @@ namespace PatientDemographics
 
         public void Configure(IApplicationBuilder app)
         {
-            Log.Debug("Patient.");
             Log.Debug("Startup : Configure()");
             Log.Debug($"EnvironmentName : {_env.EnvironmentName}");
             app.UseSerilogRequestLogging();

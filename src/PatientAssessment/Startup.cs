@@ -23,7 +23,8 @@ namespace PatientAssessment
         public void ConfigureServices(IServiceCollection services)
         {
             Log.Debug("Startup : ConfigureServices()");
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options => options.UseMemberCasing());;
             services.AddHttpClient();
             services.AddSingleton<IAssessmentService, AssessmentService>();
             services.AddCustomSwagger();
@@ -32,7 +33,6 @@ namespace PatientAssessment
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Debug("Assessment.");
             Log.Debug("Startup : Configure()");
             Log.Debug($"EnvironmentName : {env.EnvironmentName}");
             app.UseSerilogRequestLogging();

@@ -1,4 +1,77 @@
 ﻿@page "/"
+@using BlazorPatient.Models
 
-<h1>Hello, world!</h1>
-
+@inject Infrastructure.Services.INoteService NoteService
+@inject Infrastructure.Services.IPatientService PatientService
+@inject Infrastructure.Services.IAssessmentService AssessmentService
+@inject NavigationManager NavigationManager
+<MudGrid>
+    <MudText Variant="Variant.Text" Typo="Typo.h4" Color="Color.Primary">Health Clinic : </MudText>
+    <br />
+    @if (_assessments is null)
+    {
+        <MudCard Elevation="1">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Variant="Variant.Text" Typo="Typo.h5" Color="Color.Primary">Patient in Danger : </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                Something is wrong. Try again later !
+            </MudCardContent>
+        </MudCard>
+    }
+    else if (_assessments is { Count: 0 })
+    {
+        <MudCard Elevation="1">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Variant="Variant.Text" Typo="Typo.h5" Color="Color.Primary">Patient in Danger : </MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                No patient in Danger found.
+            </MudCardContent>
+        </MudCard>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Variant="Variant.Text" Typo="Typo.h5" Color="Color.Default">Patients in Danger : </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Style="display :flex">
+                    @foreach (var item in _assessments)
+                    {
+                        if (item.RiskLevel == RiskLevel.InDanger)
+                        {
+                            @
+                            {
+                                var patient = _patients.Find(x => x.FamilyName == item.FamilyName);
+                                <MudItem xs="6">
+                                    <MudCard Elevation="2" Class="py-8">
+                                        <MudCardContent>
+                                            <MudText Variant="Variant.Text" Typo="Typo.h5" Color="Color.Primary">
+                                                @item.GivenName @item.FamilyName
+                                                <MudChip  Icon="@Icons.Material.Filled.Dangerous" Color="Color.Error" Variant="Variant.Filled">InDanger</MudChip>
+                                            </MudText>
+                                            <MudText Variant="Variant.Text" Margin="Margin.Normal">Age : <MudText Color="Color.Primary" Inline="true">@patient?.GetAge()</MudText></MudText>
+                                            <MudText Variant="Variant.Text" Margin="Margin.Normal">Date of Birth : <MudText Color="Color.Primary" Inline="true">@patient.DateOfBirth.Value.ToShortDateString() </MudText></MudText>
+                                            <MudText Variant="Variant.Text" Margin="Margin.Normal">Gender : <MudText Color="Color.Primary" Inline="true">@item.Gender</MudText></MudText>
+                                            <MudText Variant="Variant.Text" Margin="Margin.Normal">Home Address : <MudText Color="Color.Primary" Inline="true">@patient?.HomeAddress</MudText></MudText>
+                                            <MudText Variant="Variant.Text" Margin="Margin.Normal">Phone Number : <MudText Color="Color.Primary" Inline="true">@patient?.PhoneNumber</MudText></MudText>
+                                        </MudCardContent>
+                                    </MudCard>
+                                </MudItem>
+                            }
+                        }
+                    }
+                    <br />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
