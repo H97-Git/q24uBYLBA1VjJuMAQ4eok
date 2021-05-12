@@ -107,7 +107,7 @@ namespace BlazorPatient.Pages
 
         private void OnRowClicked(TableRowClickEventArgs<PatientModel> args)
         {
-            NavigationManager.NavigateTo($"/Patients/{args.Item.Id}");
+            NavigationManager.NavigateTo($"/Patient/{args.Item.Id}");
         }
     }
 }

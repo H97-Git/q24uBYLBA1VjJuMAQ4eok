@@ -4,94 +4,95 @@
 @inject Infrastructure.Services.IAssessmentService AssessmentService
 @inject ISnackbar SnackBar
 @inject NavigationManager NavigationManager
-@if (_patients is null)
-{
+
+    @if (_patients is null)
+    {
+        <MudCard Elevation="25">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Align="Align.Center" Variant="Variant.Text" Typo="Typo.h5">Loading ...</MudText>
+                    <br />
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+                    <br />
+                </CardHeaderContent>
+            </MudCardHeader>
+        </MudCard>
+    }
+    else if (_patients.Count is 0)
+    {
+        <MudCard Elevation="25">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Variant="Variant.Text" Typo="Typo.h6">No patient found.</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+        </MudCard>
+    }
+    else
+    {
+        <MudTable id="PatientTable" T="PatientModel" Elevation="25" Items="_patients" Filter="new Func<PatientModel, bool>(SearchPatient)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true" OnRowClick="@(args => OnRowClicked(args))">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Patients</MudText>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="_searchString"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              Placeholder="Search for Patient..."
+                              IconSize="Size.Medium" Class="mt-0">
+                </MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                @*<MudTh>Assessment</MudTh>*@
+                <MudTh>Given Name</MudTh>
+                <MudTh>Family Name</MudTh>
+                <MudTh>Date Of Birth</MudTh>
+                <MudTh>Gender</MudTh>
+                <MudTh>Home Address</MudTh>
+                <MudTh>Phone Number</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                @*<MudTd><MudChip Icon="@GetAssessmentIcon(context)" Color="@GetAssessmentColor(context)" Variant="Variant.Filled">@GetAssessmentText(context)</MudChip></MudTd>*@
+                <MudTd>@context.GivenName</MudTd>
+                <MudTd>@context.FamilyName</MudTd>
+                <MudTd>@GetPatientDate(context.DateOfBirth)</MudTd>
+                <MudTd>@context.Gender</MudTd>
+                <MudTd Class="homeAddress">@context.HomeAddress</MudTd>
+                <MudTd>@context.PhoneNumber</MudTd>
+                <MudTd>
+                    <MudTooltip Text="Edit">
+                        <MudFab @onclick="@(()=>EditPatient(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+    <br />
     <MudCard Elevation="25">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Align="Align.Center" Variant="Variant.Text" Typo="Typo.h5">Loading ...</MudText>
-                <br/>
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
-                <br/>
+                <MudText Typo="Typo.h6">@_cardHeaderString</MudText>
             </CardHeaderContent>
         </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="_patient.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true" />
+            <MudTextField @bind-Value="_patient.GivenName" Label="Given Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <MudTextField @bind-Value="_patient.FamilyName" Label="Family Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+            <MudDatePicker @bind-Date="_patient.DateOfBirth"
+                           Color="Color.Info"
+                           DisableToolbar="true"
+                           Label="Date Of Birth"
+                           MinDate="DateTime.Now.Subtract(new TimeSpan(876600,0,0))"
+                           TitleDateFormat="dd MMM" />
+            <MudSelect @bind-Value="_patient.Gender" Label="Gender" Variant="Variant.Text" Margin="Margin.Normal">
+                @foreach (Gender item in Enum.GetValues(typeof(Gender)))
+                {
+                    <MudSelectItem T="Gender?" Value="@item" />
+                }
+            </MudSelect>
+            <MudTextField @bind-Value="_patient.HomeAddress" Label="Home Address" Variant="Variant.Text" Margin="Margin.Normal" />
+            <MudTextField @bind-Value="_patient.PhoneNumber" Label="Phone Number" Variant="Variant.Text" Margin="Margin.Normal" />
+            <br />
+            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="SavePatient">Save Patient</MudButton>
+        </MudCardContent>
     </MudCard>
-}
-else if (_patients.Count is 0)
-{
-    <MudCard Elevation="25">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Variant="Variant.Text" Typo="Typo.h6">No patient found.</MudText>
-            </CardHeaderContent>
-        </MudCardHeader>
-    </MudCard>
-}
-else
-{
-    <MudTable id="PatientTable" T="PatientModel" Elevation="25" Items="_patients" Filter="new Func<PatientModel, bool>(SearchPatient)" @bind-patient="_patient" Dense="true" Hover="true" Striped="true" OnRowClick="@(args => OnRowClicked(args))">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Patients</MudText>
-            <MudToolBarSpacer />
-            <MudTextField @bind-Value="_searchString"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.Search"
-                          Placeholder="Search for Patient..."
-                          IconSize="Size.Medium" Class="mt-0">
-            </MudTextField>
-        </ToolBarContent>
-        <HeaderContent>
-            @*<MudTh>Assessment</MudTh>*@
-            <MudTh>Given Name</MudTh>
-            <MudTh>Family Name</MudTh>
-            <MudTh>Date Of Birth</MudTh>
-            <MudTh>Gender</MudTh>
-            <MudTh>Home Address</MudTh>
-            <MudTh>Phone Number</MudTh>
-            <MudTh>Actions</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            @*<MudTd><MudChip Icon="@GetAssessmentIcon(context)" Color="@GetAssessmentColor(context)" Variant="Variant.Filled">@GetAssessmentText(context)</MudChip></MudTd>*@
-            <MudTd>@context.GivenName</MudTd>
-            <MudTd>@context.FamilyName</MudTd>
-            <MudTd>@GetPatientDate(context.DateOfBirth)</MudTd>
-            <MudTd>@context.Gender</MudTd>
-            <MudTd Class="homeAddress">@context.HomeAddress</MudTd>
-            <MudTd>@context.PhoneNumber</MudTd>
-            <MudTd>
-                <MudTooltip Text="Edit">
-                    <MudFab @onclick="@(()=>EditPatient(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                </MudTooltip>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-}
-<br />
-<MudCard Elevation="25">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">@_cardHeaderString</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudTextField @bind-Value="_patient.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Normal" Disabled="true" />
-        <MudTextField @bind-Value="_patient.GivenName" Label="Given Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="_patient.FamilyName" Label="Family Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-        <MudDatePicker @bind-Date="_patient.DateOfBirth"
-                       Color="Color.Info"
-                       DisableToolbar="true"
-                       Label="Date Of Birth"
-                       MinDate="DateTime.Now.Subtract(new TimeSpan(876600,0,0))"
-                       TitleDateFormat="dd MMM" />
-        <MudSelect @bind-Value="_patient.Gender" Label="Gender" Variant="Variant.Text" Margin="Margin.Normal">
-            @foreach (Gender item in Enum.GetValues(typeof(Gender)))
-            {
-                <MudSelectItem T="Gender?" Value="@item" />
-            }
-        </MudSelect>
-        <MudTextField @bind-Value="_patient.HomeAddress" Label="Home Address" Variant="Variant.Text" Margin="Margin.Normal" />
-        <MudTextField @bind-Value="_patient.PhoneNumber" Label="Phone Number" Variant="Variant.Text" Margin="Margin.Normal" />
-        <br />
-        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="SavePatient">Save Patient</MudButton>
-    </MudCardContent>
-</MudCard>

@@ -1,13 +1,15 @@
 ﻿using BlazorPatient.Models;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.Web;
-using MudBlazor;
 
 namespace BlazorPatient.Pages
 {
     public partial class Index
     {
+        [Inject] 
+        public IJSRuntime JsRuntime { get; set; }
         private List<AssessmentModel> _assessments;
         private List<PatientModel> _patients = new();
 
@@ -20,11 +22,6 @@ namespace BlazorPatient.Pages
                 var assessment = await AssessmentService.GetByPatientId(item.Id);
                 _assessments.Add(assessment);
             }
-        }
-
-        private void OnRowClicked(MouseEventArgs args)
-        {
-            NavigationManager.NavigateTo($"/Patients/{args}");
         }
     }
 }

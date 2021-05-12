@@ -1,3 +1,4 @@
+using System;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,10 +36,16 @@ namespace PatientDemographics
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
 
-            string connectionString = _env.IsDevelopment() ? "PatientDB" : "DockerPatientDb";
-            services.AddDbContext<PatientContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString(connectionString)));
+            //string connectionString = Configuration.GetConnectionString(_env.IsDevelopment() ? "PatientDB" : "DockerPatientDb");
+            //Log.Debug(connectionString);
+            //services.AddDbContext<PatientContext>(options => options.UseSqlServer(connectionString));
+
+            if (_env.IsProduction())
+            {
+                string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+                Log.Debug(connectionString);
+                services.AddDbContext<PatientContext>(options => options.UseSqlServer(connectionString ?? string.Empty));
+            }
 
             services.AddCustomSwagger();
             services.AddMediatR(typeof(Startup).Assembly);

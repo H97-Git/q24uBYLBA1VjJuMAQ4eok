@@ -4,7 +4,7 @@
 @inject Infrastructure.Services.INoteService NoteService
 @inject Infrastructure.Services.IPatientService PatientService
 @inject Infrastructure.Services.IAssessmentService AssessmentService
-@inject NavigationManager NavigationManager
+
 <MudGrid>
     <MudText Variant="Variant.Text" Typo="Typo.h4" Color="Color.Primary">Health Clinic : </MudText>
     <br />
@@ -48,15 +48,14 @@
                     {
                         if (item.RiskLevel == RiskLevel.InDanger)
                         {
-                            @
-                            {
-                                var patient = _patients.Find(x => x.FamilyName == item.FamilyName);
-                                <MudItem xs="6">
-                                    <MudCard Elevation="2" Class="py-8">
+                            var patient = _patients.Find(x => x.FamilyName == item.FamilyName);
+                            <MudItem xs="6">
+                                <a href="/Patient/@patient.Id">
+                                    <MudCard Elevation="2" Class="py-6">
                                         <MudCardContent>
                                             <MudText Variant="Variant.Text" Typo="Typo.h5" Color="Color.Primary">
                                                 @item.GivenName @item.FamilyName
-                                                <MudChip  Icon="@Icons.Material.Filled.Dangerous" Color="Color.Error" Variant="Variant.Filled">InDanger</MudChip>
+                                                <MudChip Icon="@Icons.Material.Filled.Dangerous" Color="Color.Error" Variant="Variant.Filled">InDanger</MudChip>
                                             </MudText>
                                             <MudText Variant="Variant.Text" Margin="Margin.Normal">Age : <MudText Color="Color.Primary" Inline="true">@patient?.GetAge()</MudText></MudText>
                                             <MudText Variant="Variant.Text" Margin="Margin.Normal">Date of Birth : <MudText Color="Color.Primary" Inline="true">@patient.DateOfBirth.Value.ToShortDateString() </MudText></MudText>
@@ -65,8 +64,8 @@
                                             <MudText Variant="Variant.Text" Margin="Margin.Normal">Phone Number : <MudText Color="Color.Primary" Inline="true">@patient?.PhoneNumber</MudText></MudText>
                                         </MudCardContent>
                                     </MudCard>
-                                </MudItem>
-                            }
+                                </a>
+                            </MudItem>
                         }
                     }
                     <br />

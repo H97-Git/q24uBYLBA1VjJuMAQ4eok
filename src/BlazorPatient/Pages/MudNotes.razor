@@ -1,4 +1,4 @@
-﻿@page "/Patients/{PatientId:int}"
+﻿@page "/Patient/{PatientId:int}"
 @using BlazorPatient.Models
 @inject Infrastructure.Services.INoteService NoteService
 @inject Infrastructure.Services.IPatientService PatientService
@@ -43,7 +43,7 @@ else if (_notes.Count is 0)
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Variant="Variant.Text" Typo="Typo.h6">No patient notes/history found.</MudText>
-                <br/>
+                <br />
             </CardHeaderContent>
         </MudCardHeader>
     </MudCard>

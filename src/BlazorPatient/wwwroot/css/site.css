@@ -5,6 +5,9 @@
 html, body {
     font-family: 'Montserrat', sans-serif;
 }
+#PatientTable {
+    min-width: 800px;
+}
 #PatientTable tr {
     cursor: pointer;
 }
@@ -34,7 +37,11 @@ a:hover {
 .mud-grid-item-xs-6 {
     margin: 10px;
 }
+.mud-grid-item-xs-12 {
+    padding-left: 0 !important;
+}
 /*#endregion*/
+/*#region Blazor*/
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }
@@ -73,6 +80,7 @@ a:hover {
 .mud-chip {
     min-width: 125px;
 }
+/*#endregion*/
 
 /*#region NavMenu*/
 .oi {
@@ -124,6 +132,10 @@ a:hover {
 /* #endregion */
 
 @media (min-width: 650px) {
+    #PatientTable {
+        min-width: 0;
+    }
+
     .navbar-toggler {
         display: none;
     }
