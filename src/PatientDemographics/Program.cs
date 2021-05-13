@@ -37,6 +37,7 @@ namespace PatientDemographics
                     Log.Fatal(ex, "Main : An error occurred while seeding the database.");
                 }
 
+                Log.Debug("Main : Running web host...");
                 host.Run();
                 return 0;
             }

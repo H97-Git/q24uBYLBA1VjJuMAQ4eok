@@ -18,23 +18,23 @@ namespace BlazorPatient.Infrastructure.Services
         public string ErrorMessage { get; set; }
 
         private readonly HttpClient _client;
-        private readonly IHttpClientFactory _clientFactory;
-        private readonly IHostEnvironment _env;
         private record Command(PatientModel PatientDto);
         public PatientService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHostEnvironment env)
         {
-            _env = env;
-            _clientFactory = httpClientFactory;
             Configuration = configuration;
-            string baseAddress = _env.IsDevelopment() ? Configuration["BlazorPatient:PatientService:BaseAddressW"] : Configuration["BlazorPatient:PatientService:BaseAddressL"];
             _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri(baseAddress);
+
+            if (env.IsEnvironment("Docker"))
+            {
+                _client.BaseAddress = new Uri(Configuration["BlazorPatient:PatientService:BaseAddressL"]);
+            }
+            if (env.IsDevelopment())
+            {
+                _client.BaseAddress = new Uri(Configuration["BlazorPatient:PatientService:BaseAddressW"]);
+            }
         }
         public async Task<List<PatientModel>> Get()
         {
-            //await TestBaseAddress();
-            //return new List<PatientModel>();
-
             try
             {
                 var apiResponse =
@@ -89,31 +89,6 @@ namespace BlazorPatient.Infrastructure.Services
         {
             ErrorMessage = "Api can't be reached.";
             Log.Error("Api can't be reached : {message}", ex.Message);
-        }
-
-        private async Task TestBaseAddress()
-        {
-            var index = 0;
-            var baseAddressStrings = new[] { "http://0.0.0.0:5000", "http://127.0.0.1:5000", "http://localhost:5000", "http://patientdemographics-api:5000" };
-            foreach (string addressString in baseAddressStrings)
-            {
-                try
-                {
-                    Log.Debug($"Index : {index}");
-                    index++;
-                    Log.Debug(addressString);
-                    var client = _clientFactory.CreateClient();
-                    client.BaseAddress = new Uri(addressString);
-                    var apiResponse = await client.GetAsync(Configuration["BlazorPatient:PatientService:Endpoint:Get"]);
-                    string content = await apiResponse.Content.ReadAsStringAsync();
-                    Log.Debug("content :");
-                    Log.Debug(content);
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug($"Message : {ex.Message}");
-                }
-            }
         }
     }
 }

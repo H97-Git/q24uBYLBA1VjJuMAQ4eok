@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using PatientAssessment.Data;
 using Serilog;
@@ -14,11 +16,12 @@ namespace PatientAssessment.Infrastructure.Services
     {
         private readonly IHttpClientFactory _clientFactory;
         private static IConfiguration Configuration { get; set; }
-
-        public AssessmentService(IHttpClientFactory clientFactory, IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+        public AssessmentService(IHttpClientFactory clientFactory, IConfiguration configuration, IWebHostEnvironment env)
         {
             _clientFactory = clientFactory;
             Configuration = configuration;
+            _env = env;
         }
 
         public async Task<Assessment> GetAssessmentByPatientId(int patientId)
@@ -27,12 +30,26 @@ namespace PatientAssessment.Infrastructure.Services
             var noteClient = _clientFactory.CreateClient();
             try
             {
+                var baseAddressP = "";
+                var baseAddressN = "";
+
+                if (_env.IsProduction())
+                {
+                   baseAddressP = Configuration["AssessmentService:PatientBaseAddressL"];
+                   baseAddressN = Configuration["AssessmentService:NoteBaseAddressL"];
+                }
+
+                if (_env.IsDevelopment())
+                {
+                   baseAddressP = Configuration["AssessmentService:PatientBaseAddressW"];
+                   baseAddressN = Configuration["AssessmentService:NoteBaseAddressW"];
+                }
                 string patientApiContent =
-                    await GetApiContent(patientClient,Configuration["AssessmentService:PatientBaseAddress"],Configuration["AssessmentService:Endpoint:Patient"],patientId);
+                    await GetApiContent(patientClient,baseAddressP,Configuration["AssessmentService:Endpoint:Patient"],patientId);
                 if (patientApiContent is null) return null;
 
                 string noteApiContent =
-                    await GetApiContent(noteClient, Configuration["AssessmentService:NoteBaseAddress"], Configuration["AssessmentService:Endpoint:Note"], patientId);
+                    await GetApiContent(noteClient,baseAddressN, Configuration["AssessmentService:Endpoint:Note"], patientId);
                 if (noteApiContent is null) return null;
 
                 var notes = JsonConvert.DeserializeObject<List<NoteModel>>(noteApiContent);

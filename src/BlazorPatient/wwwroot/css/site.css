@@ -40,6 +40,10 @@ a:hover {
 .mud-grid-item-xs-12 {
     padding-left: 0 !important;
 }
+
+.InDanger {
+    display: flex;
+}
 /*#endregion*/
 /*#region Blazor*/
 .valid.modified:not([type=checkbox]) {

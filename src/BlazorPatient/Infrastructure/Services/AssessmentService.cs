@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 
 namespace BlazorPatient.Infrastructure.Services
@@ -12,11 +13,18 @@ namespace BlazorPatient.Infrastructure.Services
     {
         private readonly HttpClient _client;
         public IConfiguration Configuration { get; }
-        public AssessmentService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public AssessmentService(IHttpClientFactory httpClientFactory,IHostEnvironment env, IConfiguration configuration)
         {
             Configuration = configuration;
             _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri(Configuration["BlazorPatient:AssessmentService:BaseAddress"]);
+            if (env.IsEnvironment("Docker"))
+            {
+                _client.BaseAddress = new Uri(Configuration["BlazorPatient:AssessmentService:BaseAddressL"]);
+            }
+            if (env.IsDevelopment())
+            {
+                _client.BaseAddress = new Uri(Configuration["BlazorPatient:AssessmentService:BaseAddressW"]);
+            }
         }
 
         public async Task<AssessmentModel> GetByPatientId(int patientId)

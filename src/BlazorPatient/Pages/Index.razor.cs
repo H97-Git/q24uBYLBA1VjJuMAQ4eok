@@ -1,6 +1,4 @@
 ﻿using BlazorPatient.Models;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,8 +6,6 @@ namespace BlazorPatient.Pages
 {
     public partial class Index
     {
-        [Inject] 
-        public IJSRuntime JsRuntime { get; set; }
         private List<AssessmentModel> _assessments;
         private List<PatientModel> _patients = new();
 

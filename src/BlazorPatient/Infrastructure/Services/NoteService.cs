@@ -22,7 +22,16 @@ namespace BlazorPatient.Infrastructure.Services
         {
             Configuration = configuration;
             _client = httpClientFactory.CreateClient();
-            _client.BaseAddress = new Uri(Configuration["BlazorPatient:NoteService:BaseAddress"]);
+            if (env.IsEnvironment("Docker"))
+            {
+                _client.BaseAddress = new Uri(Configuration["BlazorPatient:NoteService:BaseAddressL"]);
+                Log.Debug(_client.BaseAddress.ToString());
+            }
+            if (env.IsDevelopment())
+            {
+                _client.BaseAddress = new Uri(Configuration["BlazorPatient:NoteService:BaseAddressW"]);
+            }
+
         }
 
         public async Task<List<NoteModel>> GetByPatientId(int patientId)

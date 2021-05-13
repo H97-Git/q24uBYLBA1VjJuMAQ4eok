@@ -22,7 +22,7 @@ namespace BlazorPatient
 
             try
             {
-                Log.Debug("Main : Building + Running web host...");
+                Log.Debug("Main : Building/Running web host...");
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }
@@ -42,6 +42,7 @@ namespace BlazorPatient
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseStaticWebAssets();
                     webBuilder.UseStartup<Startup>();
                 });
     }

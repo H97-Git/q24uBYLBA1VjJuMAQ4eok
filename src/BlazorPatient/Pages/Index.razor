@@ -43,7 +43,7 @@
                         <MudText Variant="Variant.Text" Typo="Typo.h5" Color="Color.Default">Patients in Danger : </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
-                <MudCardContent Style="display :flex">
+                <MudCardContent Class="InDanger">
                     @foreach (var item in _assessments)
                     {
                         if (item.RiskLevel == RiskLevel.InDanger)
@@ -68,7 +68,6 @@
                             </MudItem>
                         }
                     }
-                    <br />
                 </MudCardContent>
             </MudCard>
         </MudItem>

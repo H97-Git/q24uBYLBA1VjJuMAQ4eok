@@ -36,16 +36,8 @@ namespace PatientDemographics
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientService, PatientService>();
 
-            //string connectionString = Configuration.GetConnectionString(_env.IsDevelopment() ? "PatientDB" : "DockerPatientDb");
-            //Log.Debug(connectionString);
-            //services.AddDbContext<PatientContext>(options => options.UseSqlServer(connectionString));
-
-            if (_env.IsProduction())
-            {
-                string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-                Log.Debug(connectionString);
-                services.AddDbContext<PatientContext>(options => options.UseSqlServer(connectionString ?? string.Empty));
-            }
+            string connectionString = Configuration.GetConnectionString(_env.IsDevelopment() ? "PatientDB" : "DockerPatientDb");
+            services.AddDbContext<PatientContext>(options => options.UseSqlServer(connectionString));
 
             services.AddCustomSwagger();
             services.AddMediatR(typeof(Startup).Assembly);
@@ -69,6 +61,7 @@ namespace PatientDemographics
 
             if (_env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseHttpsRedirection();
             }
 

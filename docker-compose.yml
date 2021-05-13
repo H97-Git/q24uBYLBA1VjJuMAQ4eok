@@ -2,30 +2,32 @@ version: '3.4'
 
 services:
 
-  #blazorpatient:
-  #  image: ${DOCKER_REGISTRY-}blazorpatient
-  #  build:
-  #    context: .
-  #    dockerfile: src/BlazorPatient/Dockerfile
-  #  ports:
-  #   - "6000:80"
-  #   - "6001:443"
-  #  depends_on:
-  #   - patientdemographics-api
-  #   - patienthistory-api
+  blazorpatient:
+    image: ${DOCKER_REGISTRY-}blazorpatient
+    build:
+      context: .
+      dockerfile: src/BlazorPatient/Dockerfile
+    ports:
+     - "6000:80"
+     - "6001:443"
+    depends_on:
+     - patientdemographics-api
+     - patienthistory-api
+    networks:
+     - bridge
 
-  #patientdemographics-api:
-  #  image: ${DOCKER_REGISTRY-}patientdemographics
-  #  build:
-  #    context: .
-  #    dockerfile: src/PatientDemographics/Dockerfile
-  #  environment:
-  #  - DB_CONNECTION_STRING=Server=127.0.0.1,5433;Database=Patients;User Id=SA;Password=Passw@rd123!
-  #  ports:
-  #   - "5000:80"
-  #   - "5001:443"
-  #  depends_on:
-  #   - sqldata
+  patientdemographics-api:
+    image: ${DOCKER_REGISTRY-}patientdemographics
+    build:
+      context: .
+      dockerfile: src/PatientDemographics/Dockerfile
+    ports:
+     - "5000:80"
+     - "5001:443"
+    depends_on:
+     - sqldata
+    networks:
+     - bridge
 
   patienthistory-api:
     image: ${DOCKER_REGISTRY-}patienthistory
@@ -38,7 +40,7 @@ services:
     depends_on:
      - mongo
     networks:
-      - local
+     - bridge
 
   patientassessment-api:
     image: ${DOCKER_REGISTRY-}patientassessment
@@ -49,7 +51,7 @@ services:
      - "5004:80"
      - "5005:443"
     networks:
-      - local
+     - bridge
 
   mongo:
     container_name: mongo
@@ -58,18 +60,17 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - local
+     - bridge
 
-  #sqldata:
-  #  image: mcr.microsoft.com/mssql/server:latest
-  #  environment:
-  #     - SA_PASSWORD=Passw@rd123!
-  #     - ACCEPT_EULA=Y
-  #  ports:
-  #      - "5433:1434"
-  #  networks:
-  #   - local
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+       - SA_PASSWORD=Passw@rd123!
+       - ACCEPT_EULA=Y
+    ports:
+        - "5433:1434"
+    networks:
+     - bridge
 
 networks:
-  local:
-    external: true
+  bridge:

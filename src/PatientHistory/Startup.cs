@@ -30,7 +30,7 @@ namespace PatientHistory
         {
             Log.Debug("Startup : ConfigureServices()");
             services.AddControllers()
-                .AddNewtonsoftJson(options => options.UseMemberCasing());;
+                .AddNewtonsoftJson(options => options.UseMemberCasing()); ;
 
             services.AddHttpClient();
             services.AddTransient<INoteRepository, NoteRepository>();
@@ -66,11 +66,11 @@ namespace PatientHistory
             }
 
             app.UseCustomExceptionHandler();
-            app.UseHttpsRedirection();
             app.UseCustomSwagger();
 
             if (env.IsDevelopment())
             {
+                app.UseHttpsRedirection();
                 app.UseDeveloperExceptionPage();
             }
 
