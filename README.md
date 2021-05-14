@@ -44,7 +44,7 @@ Microservice to calculate the diabetes risk level of a patient. With datas from 
 Simple .NET Core Blazor application connected to all services above.
 To ship something deliverable.
 
-## Links
+## Docker Links (when containerized)
 - Blazor : [http://localhost:6000/](http://localhost:6000/)
 - Patient : [http://localhost:5000/swagger/index.html](http://localhost:5000/swagger/index.html)
 - Notes : [http://localhost:5002/swagger/index.html](http://localhost:5002/swagger/index.html)
