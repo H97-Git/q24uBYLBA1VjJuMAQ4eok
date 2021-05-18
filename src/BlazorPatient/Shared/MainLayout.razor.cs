@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using MudBlazor;
+﻿using MudBlazor;
 
 namespace BlazorPatient.Shared
 {
@@ -18,31 +17,15 @@ namespace BlazorPatient.Shared
             NavigationManager.NavigateTo("/");
         }
 
-        //protected override async Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    if (firstRender)
-        //    {
-        //        var darkMode = await LocalStorage.GetItemAsync<bool>("DarkMode");
-        //        if (darkMode)
-        //        {
-        //            await DarkMode();
-        //            _darkMode = true;
-        //            Log.Information(_darkMode.ToString());
-        //        }
-        //    }
-        //}
-
-        async Task DarkMode()
+        void DarkMode()
         {
             if (_currentTheme == _defaultTheme)
             {
                 _currentTheme = _darkTheme;
-                await LocalStorage.SetItemAsync("DarkMode", true);
             }
             else
             {
                 _currentTheme = _defaultTheme;
-                await LocalStorage.SetItemAsync("DarkMode", false);
             }
         }
 

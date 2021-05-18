@@ -1,4 +1,3 @@
-using Blazored.LocalStorage;
 using BlazorPatient.Infrastructure.Services;
 using BlazorPatient.Internal;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +29,6 @@ namespace BlazorPatient
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<INoteService, NoteService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
-            services.AddBlazoredLocalStorage();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

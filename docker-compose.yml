@@ -50,6 +50,9 @@ services:
     ports:
      - "5004:80"
      - "5005:443"
+    depends_on:
+    - patientdemographics-api
+    - patienthistory-api
     networks:
      - bridge
 
