@@ -1,24 +1,15 @@
 # P10 OpenClassrooms
 A medical solution to Insert, View, Edit and Calculate data about Patients
 
-## Ez Mode
+## USE
 [Visual Studio ( or VSCode)](https://visualstudio.microsoft.com/)
 
-Open Visual Studio :
-1. Download the project
-1. Open the project
-2. Make sure 'docker-compose(.yml)' is set a start-up project.
+With Visual Studio open & Docker running :
+```
+1. Download the project ( git clone https://github.com/H97-Git/q24uBYLBA1VjJuMAQ4eok.git Path )
+1. Open the project ( *.sln )
+2. Make sure 'docker-compose(.yml)' is set a start-up project. 
 3. CTRL + F5
-
-## To Use
-To clone and run this repository you'll need [Git](https://git-scm.com) & [Docker](https://docs.docker.com/get-docker/) installed on your computer. From your command line:
-```bash
-# Clone this repository
-git clone https://github.com/H97-Git/q24uBYLBA1VjJuMAQ4eok.git P10
-# Change Dir in the cloned repository.
-cd P10
-# Run the application (Command copied from VisualStudio)
-docker-compose -f ".\docker-compose.yml" -p P10DockerApplication --no-ansi build
 ```
 ## Patient
 Microservice to Create, Edit and Get Patient data (SQL Server) :
