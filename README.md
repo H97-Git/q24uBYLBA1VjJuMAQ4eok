@@ -4,12 +4,14 @@ A medical solution to Insert, View, Edit and Calculate data about Patients
 ## USE
 [Visual Studio ( or VSCode)](https://visualstudio.microsoft.com/)
 
-With Visual Studio open & Docker running :
+With Docker running :
 ```
 1. Download the project ( git clone https://github.com/H97-Git/q24uBYLBA1VjJuMAQ4eok.git Path )
-1. Open the project ( *.sln )
-2. Make sure 'docker-compose(.yml)' is set a start-up project. 
-3. CTRL + F5
+2. Open the project ( *.sln )
+3. Build the solution.
+3. Make sure 'docker-compose(.yml)' is set a start-up project.
+4. Wait Container Tools.
+5. CTRL + F5
 ```
 ## Patient
 Microservice to Create, Edit and Get Patient data (SQL Server) :
