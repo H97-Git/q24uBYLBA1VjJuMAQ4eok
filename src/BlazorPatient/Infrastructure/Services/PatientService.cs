@@ -72,7 +72,7 @@ namespace BlazorPatient.Infrastructure.Services
                     : await _client.PutAsync(Configuration["BlazorPatient:PatientService:Endpoint:Put"] + patientDto.Id, editContent);
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                ErrorMessage = JsonConvert.DeserializeObject<string>(content);
+                HandleApiError(content);
 
                 return apiResponse.IsSuccessStatusCode ? patientDto.Id == 0 ? 1 : 2 : 0;
                 //IsSuccessStatusCode = true && Patient.Id = 0 - It's a Save return 1 : Patient.Id != 0 - It's an Update return 2
@@ -89,6 +89,36 @@ namespace BlazorPatient.Infrastructure.Services
         {
             ErrorMessage = "Api can't be reached.";
             Log.Error("Api can't be reached : {message}", ex.Message);
+        }
+
+        private void HandleApiError(string content)
+        {
+            Log.Debug(content);
+            ErrorMessage = string.Empty;
+            if (content.Contains("Validation Exception"))
+            {
+                if (content.Contains("given name"))
+                {
+                    ErrorMessage += "Must specify a given name.\n";
+                }
+
+                if (content.Contains("family name"))
+                {
+                    ErrorMessage += "Must specify a family name.\n";
+                }
+            }
+            if (content.Contains("errors"))
+            {
+                if (content.Contains("Gender"))
+                {
+                    ErrorMessage += "Must specify a gender.\n";
+                }
+
+                if (content.Contains("DateOfBirth"))
+                {
+                    ErrorMessage += "Must specify a date of birth.\n";
+                }
+            }
         }
     }
 }

@@ -25,7 +25,6 @@ namespace BlazorPatient.Infrastructure.Services
             if (env.IsEnvironment("Docker"))
             {
                 _client.BaseAddress = new Uri(Configuration["BlazorPatient:NoteService:BaseAddressL"]);
-                Log.Debug(_client.BaseAddress.ToString());
             }
             if (env.IsDevelopment())
             {
@@ -65,7 +64,11 @@ namespace BlazorPatient.Infrastructure.Services
                     : await _client.PutAsync(Configuration["BlazorPatient:NoteService:Endpoint:Put"] + note.Id, addContent);
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
-                ErrorMessage = JsonConvert.DeserializeObject<string>(content);
+                ErrorMessage = string.Empty;
+                if (content.Contains("Validation Exception"))
+                {
+                    ErrorMessage = "Minimum length for message is 10.\n";
+                }
 
                 return apiResponse.IsSuccessStatusCode ? note.Id is null ? 1 : 2 : 0;
                 //IsSuccessStatusCode = true && NoteModel.Id is null ? - It's a Save return 1 : NoteModel.Id is not null - It's an Update return 2

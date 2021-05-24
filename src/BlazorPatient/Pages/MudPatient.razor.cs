@@ -85,8 +85,8 @@ namespace BlazorPatient.Pages
             switch (result)
             {
                 case 0:
-                    SnackBar.Add("Something went wrong.", Severity.Error);
-                    SnackBar.Add(PatientService.ErrorMessage);
+                    SnackBar.Add("Something went wrong : ", Severity.Error);
+                    SnackBar.Add(PatientService.ErrorMessage,Severity.Info);
                     _patient = _cachePatient;
                     break;
                 case 1:
