@@ -21,6 +21,7 @@ namespace PatientAssessment
                 .CreateLogger();
             try
             {
+                Log.Debug("Main : Assessment Service.");
                 Log.Debug("Main : Building/Running web host...");
                 CreateHostBuilder(args).Build().Run();
                 return 0;

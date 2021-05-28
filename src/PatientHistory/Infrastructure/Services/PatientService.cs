@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace PatientHistory.Infrastructure.Services
 {

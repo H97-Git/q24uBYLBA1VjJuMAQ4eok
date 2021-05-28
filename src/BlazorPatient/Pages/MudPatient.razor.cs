@@ -30,7 +30,6 @@ namespace BlazorPatient.Pages
             //}
         }
 
-
         private string GetAssessmentIcon(PatientModel patientModel)
         {
             var riskLevel = _assessments.Find(p => p.FamilyName == patientModel.FamilyName)?.RiskLevel;
@@ -59,12 +58,10 @@ namespace BlazorPatient.Pages
         {
             return _assessments.Find(p => p.FamilyName == patientModel.FamilyName)?.RiskLevel.ToString();
         }
-
         private static string GetPatientDate(DateTime? dateOfBirth)
         {
             return dateOfBirth != null ? dateOfBirth.Value.ToShortDateString() : "";
         }
-
         private bool SearchPatient(PatientModel patientParam)
         {
             if (string.IsNullOrWhiteSpace(_searchString)) return true;
@@ -72,7 +69,6 @@ namespace BlazorPatient.Pages
                    || patientParam.FamilyName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
                    || patientParam.PhoneNumber.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
         }
-
         private async Task GetPatients()
         {
             _patients = await PatientService.Get();
@@ -86,7 +82,7 @@ namespace BlazorPatient.Pages
             {
                 case 0:
                     SnackBar.Add("Something went wrong : ", Severity.Error);
-                    SnackBar.Add(PatientService.ErrorMessage,Severity.Info);
+                    SnackBar.Add(PatientService.ErrorMessage, Severity.Info);
                     _patient = _cachePatient;
                     break;
                 case 1:
@@ -104,7 +100,6 @@ namespace BlazorPatient.Pages
             _patient = _patients.FirstOrDefault(p => p.Id == id);
             _cachePatient = _patient;
         }
-
         private void OnRowClicked(TableRowClickEventArgs<PatientModel> args)
         {
             NavigationManager.NavigateTo($"/Patient/{args.Item.Id}");

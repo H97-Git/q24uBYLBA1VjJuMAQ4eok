@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <MudThemeProvider Theme="_currentTheme" />
 <MudSnackbarProvider />
@@ -9,7 +10,7 @@
                        Edge="Edge.Start"
                        Icon="@Icons.Material.Filled.Menu"
                        OnClick="DrawerToggle" />
-        <MudFab Color="Color.Primary" Icon="@Icons.Material.Rounded.Home" 
+        <MudFab Color="Color.Primary" Icon="@Icons.Material.Rounded.Home"
                 IconSize="Size.Large" Label="Health Clinics" Size="Size.Large" Link="/" />
         <MudAppBarSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4" OnClick="DarkMode" />

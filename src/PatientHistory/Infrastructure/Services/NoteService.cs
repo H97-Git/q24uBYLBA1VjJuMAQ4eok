@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Mapster;
 using PatientHistory.Internal;
+using Serilog;
 
 namespace PatientHistory.Infrastructure.Services
 {
@@ -66,7 +67,7 @@ namespace PatientHistory.Infrastructure.Services
             }
 
             bool patient = await _patientService.Get(noteDto.PatientId);
-            if (!patient)
+            if (patient is false)
             {
                 throw new KeyNotFoundException($"{noteDto.PatientId}");
             }
@@ -77,7 +78,7 @@ namespace PatientHistory.Infrastructure.Services
 
         public void Update(string id, NoteDto noteDto)
         {
-            if (noteDto == null)
+            if (noteDto is null)
             {
                 throw new ArgumentNullException(nameof(NoteDto));
             }

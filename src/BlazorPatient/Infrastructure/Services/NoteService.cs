@@ -65,7 +65,7 @@ namespace BlazorPatient.Infrastructure.Services
 
                 string content = await apiResponse.Content.ReadAsStringAsync();
                 ErrorMessage = string.Empty;
-                if (content.Contains("Validation Exception"))
+                if (content.Contains("Validation"))
                 {
                     ErrorMessage = "Minimum length for message is 10.\n";
                 }

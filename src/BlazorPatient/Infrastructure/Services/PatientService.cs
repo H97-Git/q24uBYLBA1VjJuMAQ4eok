@@ -93,7 +93,6 @@ namespace BlazorPatient.Infrastructure.Services
 
         private void HandleApiError(string content)
         {
-            Log.Debug(content);
             ErrorMessage = string.Empty;
             if (content.Contains("Validation Exception"))
             {

@@ -23,6 +23,7 @@ namespace PatientDemographics
                 .CreateLogger();
             try
             {
+                Log.Debug("Main : Demographic Service.");
                 Log.Debug("Main : Building web host...");
                 var host = CreateHostBuilder(args).Build();
                 using var scope = host.Services.CreateScope();

@@ -22,6 +22,7 @@ namespace BlazorPatient
 
             try
             {
+                Log.Debug("Main : Web UI.");
                 Log.Debug("Main : Building/Running web host...");
                 CreateHostBuilder(args).Build().Run();
                 return 0;

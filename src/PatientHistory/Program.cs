@@ -24,6 +24,7 @@ namespace PatientHistory
 
             try
             {
+                Log.Debug("Main : History Service.");
                 Log.Debug("Main : Building web host...");
                 var host = CreateHostBuilder(args).Build();
                 using var scope = host.Services.CreateScope();

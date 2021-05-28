@@ -1,40 +1,32 @@
-﻿using MudBlazor;
+﻿using System.Threading.Tasks;
+using MudBlazor;
 
 namespace BlazorPatient.Shared
 {
     public partial class MainLayout
     {
-        MudTheme _currentTheme = new();
-        bool _drawerOpen = true;
-
-        protected override void OnInitialized()
+        private MudTheme _currentTheme = new();
+        private bool _drawerOpen = true;
+        
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            _currentTheme = _defaultTheme;
+            var isDarkmode = await localStorage.GetItemAsync<bool>("Darkmode");
+            _currentTheme = isDarkmode ? _darkTheme : _defaultTheme;
+            StateHasChanged();
         }
 
-        void GoHome()
+        private async Task DarkMode()
         {
-            NavigationManager.NavigateTo("/");
+            _currentTheme = _currentTheme == _defaultTheme ? _darkTheme : _defaultTheme;
+            await localStorage.SetItemAsync("Darkmode",_currentTheme == _darkTheme);
         }
 
-        void DarkMode()
-        {
-            if (_currentTheme == _defaultTheme)
-            {
-                _currentTheme = _darkTheme;
-            }
-            else
-            {
-                _currentTheme = _defaultTheme;
-            }
-        }
-
-        void DrawerToggle()
+        private void DrawerToggle()
         {
             _drawerOpen = !_drawerOpen;
         }
 
-        readonly MudTheme _defaultTheme = new()
+        private readonly MudTheme _defaultTheme = new()
         {
             Palette = new Palette()
             {
@@ -54,7 +46,8 @@ namespace BlazorPatient.Shared
 
             }
         };
-        readonly MudTheme _darkTheme = new()
+
+        private readonly MudTheme _darkTheme = new()
         {
             Palette = new Palette()
             {
