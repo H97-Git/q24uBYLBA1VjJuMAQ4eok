@@ -1,13 +1,12 @@
-﻿using System;
+﻿using FluentValidation;
+using Mapster;
 using PatientHistory.Data;
 using PatientHistory.Data.DTO;
 using PatientHistory.Infrastructure.Repositories;
+using PatientHistory.Internal;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentValidation;
-using Mapster;
-using PatientHistory.Internal;
-using Serilog;
 
 namespace PatientHistory.Infrastructure.Services
 {
@@ -54,14 +53,13 @@ namespace PatientHistory.Infrastructure.Services
 
         public async Task<string> Create(NoteDto noteDto)
         {
-            if (noteDto == null)
+            if (noteDto is null)
             {
                 throw new ArgumentNullException(nameof(NoteDto));
             }
 
             var validationResult = await _noteValidator.ValidateAsync(noteDto);
-
-            if (!validationResult.IsValid)
+            if (validationResult.IsValid is false)
             {
                 throw new ValidationException(validationResult.ToString(), validationResult.Errors);
             }

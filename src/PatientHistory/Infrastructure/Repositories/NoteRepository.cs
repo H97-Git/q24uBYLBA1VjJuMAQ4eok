@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using PatientHistory.Data;
-using Serilog;
+using System.Collections.Generic;
 
 namespace PatientHistory.Infrastructure.Repositories
 {
@@ -22,16 +20,7 @@ namespace PatientHistory.Infrastructure.Repositories
 
         public string Create(Note note)
         {
-            try
-            {
-                _context.Notes.InsertOne(note);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                throw;
-            }
-
+            _context.Notes.InsertOne(note);
             return note.Id;
         }
 

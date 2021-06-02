@@ -11,6 +11,7 @@ namespace BlazorPatient.Pages
     {
         private string _searchString;
         private string _cardHeaderString = "Add a patient :";
+
         private List<PatientModel> _patients;
         private PatientModel _patient = new();
         private PatientModel _cachePatient = new();

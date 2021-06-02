@@ -13,8 +13,10 @@ namespace BlazorPatient.Pages
         private NoteModel _note = new();
         private List<PatientModel> _patients = new();
         private PatientModel _patient = new();
+
         private string _searchString = "";
         private string _cardHeaderString = "Add a note :";
+
         private int _age;
         private string _riskLevel;
         private string _riskLevelIcon;

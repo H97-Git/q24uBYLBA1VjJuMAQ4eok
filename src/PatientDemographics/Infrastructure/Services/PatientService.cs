@@ -31,19 +31,19 @@ namespace PatientDemographics.Infrastructure.Services
         {
             var patient = await _patientRepository.GetPatient(id);
 
-            return patient == null
+            return patient is null
                 ? throw new KeyNotFoundException($"{id}")
                 : patient.Adapt<PatientDto>();
         }
 
         public async Task UpdatePatient(int id, PatientDto patientDto)
         {
-            if (patientDto == null)
+            if (patientDto is null)
             {
                 throw new ArgumentNullException(nameof(patientDto));
             }
             var validationResult = await _patientValidator.ValidateAsync(patientDto);
-            if (!validationResult.IsValid)
+            if (validationResult.IsValid is false)
             {
                 throw new ValidationException(validationResult.ToString(), validationResult.Errors);
             }
@@ -60,16 +60,17 @@ namespace PatientDemographics.Infrastructure.Services
 
         public async Task SavePatient(PatientDto patientDto)
         {
-            if (patientDto == null)
+            if (patientDto is null)
             {
                 throw new ArgumentNullException(nameof(patientDto));
             }
-            var validationResult = await _patientValidator.ValidateAsync(patientDto);
 
+            var validationResult = await _patientValidator.ValidateAsync(patientDto);
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.ToString(), validationResult.Errors);
             }
+
             var patient = patientDto.Adapt<Patient>();
             await _patientRepository.SavePatient(patient);
         }
